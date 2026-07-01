@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexSignal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a24;
+    --surface2: #1e2330;
+    --border: #252b3a;
+    --cyan: #00e5c8;
+    --cyan-dim: rgba(0,229,200,0.12);
+    --orange: #ff7c3a;
+    --orange-dim: rgba(255,124,58,0.15);
+    --text: #e8ecf0;
+    --text-muted: #6b7280;
+    --text-dim: #9ca3af;
+    --safe: #00e5c8;
+    --aggressive: #ff7c3a;
+    --red: #ef4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -0.3px;
+  }
+
+  .logo-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--cyan);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* LAYOUT */
+  .container { max-width: 480px; margin: 0 auto; padding: 16px; }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  /* SLIDER */
+  .param-row {
+    margin-bottom: 14px;
+  }
+
+  .param-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .param-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--cyan);
+    font-weight: 600;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--cyan);
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(0,229,200,0.5);
+  }
+
+  /* CHIPS */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .chip {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text-dim);
+    background: transparent;
+  }
+
+  .chip:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  .chip.active-cyan {
+    background: var(--cyan-dim);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  .chip.active-orange {
+    background: var(--orange-dim);
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+
+  /* BUTTON */
+  .btn-generate {
+    width: 100%;
+    padding: 13px;
+    background: var(--cyan);
+    color: #0d0f14;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 4px;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-generate:hover { background: #00ccb3; }
+  .btn-generate:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* LOADING */
+  .loading-bar {
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .loading-bar.active { display: block; }
+
+  .loading-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyan), #00ccff, var(--cyan));
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+    width: 60%;
+  }
+
+  @keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .loading-text {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 8px;
+    display: none;
+  }
+
+  .loading-text.active { display: block; }
+
+  /* TICKET CARD */
+  .ticket-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .ticket-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ticket-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .badge-safe {
+    background: rgba(0,229,200,0.15);
+    color: var(--safe);
+    border: 1px solid rgba(0,229,200,0.3);
+  }
+
+  .badge-aggressive {
+    background: rgba(255,124,58,0.15);
+    color: var(--aggressive);
+    border: 1px solid rgba(255,124,58,0.3);
+  }
+
+  .tip-count {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .total-odds {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .odds-safe { color: var(--safe); }
+  .odds-aggressive { color: var(--aggressive); }
+
+  .odds-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: right;
+  }
+
+  /* SELECTION ROW */
+  .selection {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .selection:last-of-type { border-bottom: none; }
+
+  .selection-teams {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+
+  .selection-market {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .selection-bottom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .prob-bar {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .prob-fill-safe {
+    height: 100%;
+    background: var(--cyan);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .prob-fill-aggressive {
+    height: 100%;
+    background: var(--orange);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .selection-odds {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 36px;
+    text-align: right;
+  }
+
+  .selection-prob {
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 30px;
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* TICKET FOOTER */
+  .ticket-footer {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .combined-prob {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .combined-prob span {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-dim);
+    font-weight: 600;
+  }
+
+  .stake-info {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .stake-info span {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--cyan);
+    font-weight: 600;
+  }
+
+  /* TICKET ACTIONS */
+  .ticket-actions {
+    display: flex;
+    gap: 8px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-regen {
+    flex: 1;
+    padding: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-regen:hover { border-color: var(--text-dim); color: var(--text); }
+
+  .btn-save {
+    flex: 1;
+    padding: 8px;
+    background: var(--cyan-dim);
+    border: 1px solid rgba(0,229,200,0.3);
+    border-radius: 6px;
+    color: var(--cyan);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-save:hover { background: rgba(0,229,200,0.2); }
+
+  /* AI NOTE */
+  .ai-note {
+    margin: 0 16px 10px;
+    padding: 8px 10px;
+    background: rgba(0,229,200,0.06);
+    border-left: 2px solid var(--cyan);
+    border-radius: 0 4px 4px 0;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ERROR */
+  .error-msg {
+    padding: 12px 16px;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 8px;
+    color: #ef4444;
+    font-size: 13px;
+    margin-bottom: 12px;
+    display: none;
+  }
+
+  /* LOGIN */
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 12px;
+  }
+
+  .login-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .login-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  .input-group { margin-bottom: 12px; }
+
+  .input-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .input-field:focus { border-color: var(--cyan); }
+
+  .btn-login {
+    width: 100%;
+    padding: 11px;
+    background: var(--cyan);
+    color: #0d0f14;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+
+  .login-switch {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .login-switch a {
+    color: var(--cyan);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    color: var(--text-muted);
+    transition: all 0.15s;
+  }
+
+  .tab.active {
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* SAVED TICKETS */
+  .saved-ticket {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+  }
+
+  .saved-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .status-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .status-pending { background: rgba(107,114,128,0.2); color: var(--text-muted); }
+  .status-won { background: rgba(0,229,200,0.15); color: var(--cyan); }
+  .status-lost { background: rgba(239,68,68,0.15); color: var(--red); }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .empty-state .icon { font-size: 32px; margin-bottom: 8px; }
+
+  /* TOKEN STORAGE */
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .btn-logout {
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-size: 11px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    ApexSignal
+  </div>
+  <div id="headerRight">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      LIVE
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- LOGIN VIEW -->
+  <div id="loginView">
+    <div class="login-card">
+      <div class="login-title" id="authTitle">Přihlášení</div>
+      <div class="login-sub">Přistup ke svým tiketům a signálům</div>
+
+      <div id="registerFields" style="display:none">
+        <div class="input-group">
+          <label class="input-label">EMAIL</label>
+          <input class="input-field" type="email" id="regEmail" placeholder="email@example.com">
+        </div>
+        <div class="input-group">
+          <label class="input-label">HESLO</label>
+          <input class="input-field" type="password" id="regPassword" placeholder="min. 8 znaků">
+        </div>
+        <button class="btn-login" onclick="register()">Vytvořit účet</button>
+        <div class="login-switch">Máš účet? <a onclick="showLogin()">Přihlásit se</a></div>
+      </div>
+
+      <div id="loginFields">
+        <div class="input-group">
+          <label class="input-label">EMAIL</label>
+          <input class="input-field" type="email" id="loginEmail" placeholder="email@example.com">
+        </div>
+        <div class="input-group">
+          <label class="input-label">HESLO</label>
+          <input class="input-field" type="password" id="loginPassword" placeholder="heslo">
+        </div>
+        <button class="btn-login" onclick="login()">Přihlásit se</button>
+        <div class="login-switch">Nemáš účet? <a onclick="showRegister()">Registrovat se</a></div>
+      </div>
+
+      <div class="error-msg" id="authError"></div>
+    </div>
+  </div>
+
+  <!-- MAIN VIEW -->
+  <div id="mainView" style="display:none">
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('generator')">Generátor</div>
+      <div class="tab" onclick="switchTab('history')">Historie</div>
+    </div>
+
+    <!-- GENERATOR SECTION -->
+    <div class="section active" id="generatorSection">
+
+      <div class="card">
+        <div class="card-title">Parametry tiketu</div>
+
+        <div class="param-row">
+          <div class="param-label">
+            Riziko
+            <span class="param-value" id="riskLabel">50%</span>
+          </div>
+          <input type="range" min="0" max="100" value="50" id="riskSlider"
+            oninput="document.getElementById('riskLabel').textContent=this.value+'%'">
+        </div>
+
+        <div class="param-row">
+          <div class="param-label">Sporty</div>
+          <div class="chips">
+            <div class="chip active-cyan" onclick="toggleChip(this,'sport')">Fotbal</div>
+            <div class="chip" onclick="toggleChip(this,'sport')">Tenis</div>
+          </div>
+        </div>
+
+        <div class="param-row">
+          <div class="param-label">Typ trhu</div>
+          <div class="chips">
+            <div class="chip active-orange" onclick="toggleChip(this,'market')">Výhra</div>
+            <div class="chip active-orange" onclick="toggleChip(this,'market')">Over gólů</div>
+            <div class="chip" onclick="toggleChip(this,'market')">Over karet</div>
+            <div class="chip" onclick="toggleChip(this,'market')">BTTS</div>
+          </div>
+        </div>
+
+        <div class="param-row" style="margin-bottom:0">
+          <div class="param-label">
+            Časový rámec
+            <span class="param-value" id="daysLabel">1 den</span>
+          </div>
+          <input type="range" min="1" max="5" value="1" id="daysSlider"
+            oninput="updateDaysLabel(this.value)">
+        </div>
+      </div>
+
+      <button class="btn-generate" id="generateBtn" onclick="generateTickets()">
+        Vygenerovat tikety →
+      </button>
+
+      <div class="loading-bar" id="loadingBar"><div class="loading-fill"></div></div>
+      <div class="loading-text" id="loadingText">Claude analyzuje zápasy…</div>
+
+      <div class="error-msg" id="genError"></div>
+
+      <div id="ticketsContainer"></div>
+
+    </div>
+
+    <!-- HISTORY SECTION -->
+    <div class="section" id="historySection">
+      <div id="historyContainer">
+        <div class="empty-state">
+          <div class="icon">🎫</div>
+          Zatím žádné uložené tikety
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = 'https://apexsignal-backend.onrender.com';
+let token = localStorage.getItem('apex_token') || '';
+let userEmail = localStorage.getItem('apex_email') || '';
+
+// ── AUTH ──────────────────────────────────────────────────────────────
+window.onload = () => {
+  if (token) showMain();
+  else showLoginView();
+};
+
+function showLoginView() {
+  document.getElementById('loginView').style.display = 'block';
+  document.getElementById('mainView').style.display = 'none';
+}
+
+function showMain() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('mainView').style.display = 'block';
+  document.getElementById('headerRight').innerHTML = `
+    <div class="user-info">
+      <span>${userEmail}</span>
+      <button class="btn-logout" onclick="logout()">Odhlásit</button>
+    </div>`;
+}
+
+function showRegister() {
+  document.getElementById('registerFields').style.display = 'block';
+  document.getElementById('loginFields').style.display = 'none';
+  document.getElementById('authTitle').textContent = 'Registrace';
+}
+
+function showLogin() {
+  document.getElementById('registerFields').style.display = 'none';
+  document.getElementById('loginFields').style.display = 'block';
+  document.getElementById('authTitle').textContent = 'Přihlášení';
+}
+
+async function login() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  try {
+    const r = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email, password})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || 'Chyba přihlášení');
+    token = d.token;
+    userEmail = d.email;
+    localStorage.setItem('apex_token', token);
+    localStorage.setItem('apex_email', userEmail);
+    showMain();
+  } catch(e) {
+    showAuthError(e.message);
+  }
+}
+
+async function register() {
+  const email = document.getElementById('regEmail').value;
+  const password = document.getElementById('regPassword').value;
+  try {
+    const r = await fetch(`${API}/auth/register`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email, password})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || 'Chyba registrace');
+    token = d.token;
+    userEmail = d.email;
+    localStorage.setItem('apex_token', token);
+    localStorage.setItem('apex_email', userEmail);
+    showMain();
+  } catch(e) {
+    showAuthError(e.message);
+  }
+}
+
+function logout() {
+  token = ''; userEmail = '';
+  localStorage.removeItem('apex_token');
+  localStorage.removeItem('apex_email');
+  document.getElementById('ticketsContainer').innerHTML = '';
+  showLoginView();
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', (i===0 && tab==='generator') || (i===1 && tab==='history'));
+  });
+  document.getElementById('generatorSection').classList.toggle('active', tab==='generator');
+  document.getElementById('historySection').classList.toggle('active', tab==='history');
+  if (tab === 'history') loadHistory();
+}
+
+// ── CHIPS ─────────────────────────────────────────────────────────────
+function toggleChip(el, group) {
+  const activeClass = group === 'sport' ? 'active-cyan' : 'active-orange';
+  el.classList.toggle(activeClass);
+}
+
+function getActiveChips(group) {
+  const map = {
+    'Fotbal': 'football', 'Tenis': 'tennis', 'Hokej': 'hockey', 'Basket': 'basketball',
+    'Výhra': 'match_winner', 'Over gólů': 'over_goals', 'Over karet': 'over_cards', 'BTTS': 'btts'
+  };
+  const activeClass = group === 'sport' ? 'active-cyan' : 'active-orange';
+  return [...document.querySelectorAll(`.chip.${activeClass}`)]
+    .map(c => map[c.textContent.trim()])
+    .filter(Boolean);
+}
+
+function updateDaysLabel(v) {
+  document.getElementById('daysLabel').textContent = v == 1 ? '1 den' : `${v} dny`;
+}
+
+// ── GENERATE ──────────────────────────────────────────────────────────
+async function generateTickets() {
+  const btn = document.getElementById('generateBtn');
+  const loadingBar = document.getElementById('loadingBar');
+  const loadingText = document.getElementById('loadingText');
+  const errEl = document.getElementById('genError');
+
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Generuji…';
+  loadingBar.classList.add('active');
+  loadingText.classList.add('active');
+
+  const sports = getActiveChips('sport');
+  const markets = getActiveChips('market');
+
+  if (!sports.length || !markets.length) {
+    showGenError('Vyber aspoň 1 sport a 1 typ trhu.');
+    resetBtn();
+    return;
+  }
+
+  try {
+    const r = await fetch(`${API}/tickets/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        risk_level: parseInt(document.getElementById('riskSlider').value),
+        sports,
+        market_types: markets,
+        time_frame_days: parseInt(document.getElementById('daysSlider').value)
+      })
+    });
+
+    if (r.status === 401) { logout(); return; }
+    const d = await r.json();
+    renderTickets(d);
+  } catch(e) {
+    showGenError('Chyba připojení k serveru. Zkus to znovu.');
+  } finally {
+    resetBtn();
+  }
+}
+
+function resetBtn() {
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = false;
+  btn.textContent = 'Vygenerovat tikety →';
+  document.getElementById('loadingBar').classList.remove('active');
+  document.getElementById('loadingText').classList.remove('active');
+}
+
+function showGenError(msg) {
+  const el = document.getElementById('genError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ── RENDER TICKETS ────────────────────────────────────────────────────
+function renderTickets(data) {
+  const container = document.getElementById('ticketsContainer');
+  container.innerHTML = '';
+
+  if (!data.safe && !data.aggressive) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="icon">🔍</div>
+      Žádné výběry nepřešly filtrem pro dnešní den.<br>Zkus změnit parametry nebo jiný den.
+    </div>`;
+    return;
+  }
+
+  if (data.safe) container.appendChild(buildTicketCard(data.safe, 'safe'));
+  if (data.aggressive) container.appendChild(buildTicketCard(data.aggressive, 'aggressive'));
+}
+
+function buildTicketCard(ticket, type) {
+  const isSafe = type === 'safe';
+  const color = isSafe ? 'safe' : 'aggressive';
+  const label = isSafe ? 'SAFE · 2-5' : 'AGGRESSIVE · 5-10';
+
+  const card = document.createElement('div');
+  card.className = 'ticket-card';
+  card.dataset.ticket = JSON.stringify(ticket);
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'ticket-header';
+  header.innerHTML = `
+    <div class="ticket-badge">
+      <span class="badge badge-${color}">${label}</span>
+      <span class="tip-count">${ticket.selections.length} tip${ticket.selections.length > 1 ? 'y' : ''}</span>
+    </div>
+    <div>
+      <div class="total-odds odds-${color}">${ticket.total_odds}</div>
+      <div class="odds-label">celkový kurz</div>
+    </div>`;
+  card.appendChild(header);
+
+  // Selections
+  ticket.selections.forEach(s => {
+    const sel = document.createElement('div');
+    sel.className = 'selection';
+    const marketLabel = formatMarket(s.market_type, s.selection);
+    const prob = Math.round(s.probability * 100);
+    const hasReal = s.market_probability !== null;
+    sel.innerHTML = `
+      <div class="selection-teams">${s.home_team} – ${s.away_team}</div>
+      <div class="selection-market">${marketLabel}${hasReal ? ' · <span style="color:var(--cyan);font-size:10px">kurzy ✓</span>' : ''}${s.market_type === 'over_cards' ? ' · <span style="color:#f59e0b;font-size:10px">⚠ ověř na Tipsportu</span>' : ''}</div>
+      <div class="selection-bottom">
+        <div class="prob-bar">
+          <div class="prob-fill-${color}" style="width:${prob}%"></div>
+        </div>
+        <div class="selection-odds" style="color:var(--${color})">${s.odds}</div>
+        <div class="selection-prob">${prob}%</div>
+      </div>`;
+    card.appendChild(sel);
+  });
+
+  // Footer
+  const footer = document.createElement('div');
+  footer.className = 'ticket-footer';
+  footer.innerHTML = `
+    <div class="combined-prob">Kombinovaná pravděpodobnost <span>${Math.round(ticket.combined_probability*100)}%</span></div>
+    <div class="stake-info">Vklad <span>${ticket.recommended_stake_pct}%</span> bankrollu</div>`;
+  card.appendChild(footer);
+
+  // Actions
+  const actions = document.createElement('div');
+  actions.className = 'ticket-actions';
+  actions.innerHTML = `
+    <button class="btn-regen" onclick="generateTickets()">↻ Regenerovat</button>
+    <button class="btn-save" onclick="saveTicket(this, '${type}')">🔖 Uložit tiket</button>`;
+  card.appendChild(actions);
+
+  return card;
+}
+
+function formatMarket(type, selection) {
+  const map = {
+    'match_winner': {'home': 'Výhra domácích', 'away': 'Výhra hostů', 'draw': 'Remíza'},
+    'over_goals': selection,
+    'over_cards': selection,
+    'btts': 'Oba dají gól',
+  };
+  if (type === 'match_winner') return map.match_winner[selection] || selection;
+  if (type === 'over_goals') return `Over ${selection.replace('over_','')} gólů`;
+  if (type === 'over_cards') return `Over ${selection.replace('over_','')} karet`;
+  if (type === 'btts') return 'BTTS — oba dají gól';
+  return selection;
+}
+
+// ── SAVE TICKET ───────────────────────────────────────────────────────
+async function saveTicket(btn, type) {
+  const card = btn.closest('.ticket-card');
+  const ticket = JSON.parse(card.dataset.ticket);
+
+  btn.textContent = 'Ukládám…';
+  btn.disabled = true;
+
+  try {
+    const r = await fetch(`${API}/tickets/save`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        ticket_type: ticket.ticket_type,
+        selections: ticket.selections,
+        total_odds: ticket.total_odds,
+        combined_probability: ticket.combined_probability,
+        recommended_stake_pct: ticket.recommended_stake_pct
+      })
+    });
+    if (r.ok) {
+      btn.textContent = '✓ Uloženo';
+      btn.style.background = 'rgba(0,229,200,0.3)';
+    } else {
+      btn.textContent = '🔖 Uložit tiket';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    btn.textContent = '🔖 Uložit tiket';
+    btn.disabled = false;
+  }
+}
+
+// ── HISTORY ───────────────────────────────────────────────────────────
+async function loadHistory() {
+  const container = document.getElementById('historyContainer');
+  container.innerHTML = '<div class="empty-state"><div class="icon">⏳</div>Načítám historii…</div>';
+
+  try {
+    const r = await fetch(`${API}/tickets/saved`, {
+      headers: {'Authorization': `Bearer ${token}`}
+    });
+    if (r.status === 401) { logout(); return; }
+    const tickets = await r.json();
+
+    if (!tickets.length) {
+      container.innerHTML = '<div class="empty-state"><div class="icon">🎫</div>Zatím žádné uložené tikety</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    tickets.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'saved-ticket';
+      const statusClass = `status-${t.status}`;
+      const statusLabel = {pending:'Čeká', won:'Výhra ✓', lost:'Prohra ✗'}[t.status] || t.status;
+      el.innerHTML = `
+        <div class="saved-header">
+          <div>
+            <span class="badge badge-${t.ticket_type}">${t.ticket_type.toUpperCase()}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="status-badge ${statusClass}">${statusLabel}</span>
+            <span style="font-family:JetBrains Mono,monospace;font-size:16px;font-weight:700;color:var(--${t.ticket_type==='safe'?'safe':'aggressive'})">${t.total_odds}</span>
+          </div>
+        </div>
+        ${t.selections.map(s=>`
+          <div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
+            <div style="font-weight:600">${s.home_team} – ${s.away_team}</div>
+            <div style="color:var(--text-muted)">${formatMarket(s.market_type,s.selection)} · ${s.odds}</div>
+          </div>`).join('')}
+        <div style="padding-top:8px;display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)">
+          <span>Pravděpodobnost <span style="color:var(--text-dim);font-family:JetBrains Mono,monospace">${Math.round(t.combined_probability*100)}%</span></span>
+          <span>Doporučený vklad <span style="color:var(--cyan);font-family:JetBrains Mono,monospace">${t.recommended_stake_pct}%</span></span>
+        </div>`;
+      container.appendChild(el);
+    });
+  } catch(e) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div>Chyba načítání historie</div>';
+  }
+}
+</script>
+</body>
+</html>
