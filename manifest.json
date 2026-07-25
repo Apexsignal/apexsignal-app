@@ -1,15 +1,13 @@
 {
   "name": "ApexSignal",
   "short_name": "ApexSignal",
-  "description": "Generátor tiketů a live signály — žádné jistoty, jen čísla, co obstojí.",
-  "start_url": "./index.html",
-  "scope": "./",
+  "description": "Appka, co denně vybírá fotbalové tikety podle vlastního modelu.",
+  "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#0B0E14",
   "theme_color": "#0B0E14",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }

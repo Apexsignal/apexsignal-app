@@ -1,1111 +1,170 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>ApexSignal</title>
+
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0B0E14" />
+<link rel="icon" href="favicon-32.png" sizes="32x32" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="ApexSignal" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
-
   :root {
-    --bg: #0d0f14;
-    --surface: #161a24;
-    --surface2: #1e2330;
-    --border: #252b3a;
-    --cyan: #00e5c8;
-    --cyan-dim: rgba(0,229,200,0.12);
-    --orange: #ff7c3a;
-    --orange-dim: rgba(255,124,58,0.15);
-    --text: #e8ecf0;
-    --text-muted: #6b7280;
-    --text-dim: #9ca3af;
-    --safe: #00e5c8;
-    --aggressive: #ff7c3a;
-    --red: #ef4444;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
-
-  /* HEADER */
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    z-index: 100;
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 700;
-    font-size: 16px;
-    letter-spacing: -0.3px;
-  }
-
-  .logo-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--cyan);
-    box-shadow: 0 0 8px var(--cyan);
-  }
-
-  .live-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--cyan);
-    font-weight: 500;
-    letter-spacing: 0.5px;
-  }
-
-  .live-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--cyan);
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  /* LAYOUT */
-  .container { max-width: 480px; margin: 0 auto; padding: 16px; }
-
-  /* CARD */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-  }
-
-  .card-title {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 14px;
-  }
-
-  /* SLIDER */
-  .param-row {
-    margin-bottom: 14px;
-  }
-
-  .param-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-    font-size: 13px;
-    color: var(--text-dim);
-  }
-
-  .param-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--cyan);
-    font-weight: 600;
-  }
-
-  input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    outline: none;
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--cyan);
-    cursor: pointer;
-    box-shadow: 0 0 8px rgba(0,229,200,0.5);
-  }
-
-  /* CHIPS */
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-
-  .chip {
-    padding: 5px 12px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    color: var(--text-dim);
-    background: transparent;
-  }
-
-  .chip:hover { border-color: var(--cyan); color: var(--cyan); }
-
-  .chip.active-cyan {
-    background: var(--cyan-dim);
-    border-color: var(--cyan);
-    color: var(--cyan);
-  }
-
-  .chip.active-orange {
-    background: var(--orange-dim);
-    border-color: var(--orange);
-    color: var(--orange);
-  }
-
-  /* BUTTON */
-  .btn-generate {
-    width: 100%;
-    padding: 13px;
-    background: var(--cyan);
-    color: #0d0f14;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s;
-    margin-top: 4px;
-    letter-spacing: 0.2px;
-  }
-
-  .btn-generate:hover { background: #00ccb3; }
-  .btn-generate:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  /* LOADING */
-  .loading-bar {
-    height: 2px;
-    background: var(--border);
-    border-radius: 1px;
-    overflow: hidden;
-    margin-top: 10px;
-    display: none;
-  }
-
-  .loading-bar.active { display: block; }
-
-  .loading-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--cyan), #00ccff, var(--cyan));
-    background-size: 200% 100%;
-    animation: loading 1.5s ease-in-out infinite;
-    width: 60%;
-  }
-
-  @keyframes loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
-  .loading-text {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-align: center;
-    margin-top: 8px;
-    display: none;
-  }
-
-  .loading-text.active { display: block; }
-
-  /* TICKET CARD */
-  .ticket-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    margin-bottom: 12px;
-    overflow: hidden;
-  }
-
-  .ticket-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .ticket-badge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .badge {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    padding: 3px 8px;
-    border-radius: 4px;
-  }
-
-  .badge-safe {
-    background: rgba(0,229,200,0.15);
-    color: var(--safe);
-    border: 1px solid rgba(0,229,200,0.3);
-  }
-
-  .badge-aggressive {
-    background: rgba(255,124,58,0.15);
-    color: var(--aggressive);
-    border: 1px solid rgba(255,124,58,0.3);
-  }
-
-  .tip-count {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
-  .total-odds {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 22px;
-    font-weight: 700;
-  }
-
-  .odds-safe { color: var(--safe); }
-  .odds-aggressive { color: var(--aggressive); }
-
-  .odds-label {
-    font-size: 10px;
-    color: var(--text-muted);
-    text-align: right;
-  }
-
-  /* SELECTION ROW */
-  .selection {
-    padding: 11px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .selection:last-of-type { border-bottom: none; }
-
-  .selection-teams {
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 3px;
-  }
-
-  .selection-market {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-  }
-
-  .selection-bottom {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .prob-bar {
-    flex: 1;
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .prob-fill-safe {
-    height: 100%;
-    background: var(--cyan);
-    border-radius: 2px;
-    transition: width 0.5s ease;
-  }
-
-  .prob-fill-aggressive {
-    height: 100%;
-    background: var(--orange);
-    border-radius: 2px;
-    transition: width 0.5s ease;
-  }
-
-  .selection-odds {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-    min-width: 36px;
-    text-align: right;
-  }
-
-  .selection-prob {
-    font-size: 11px;
-    color: var(--text-muted);
-    min-width: 30px;
-    text-align: right;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  /* TICKET FOOTER */
-  .ticket-footer {
-    padding: 10px 16px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255,255,255,0.02);
-  }
-
-  .combined-prob {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
-  .combined-prob span {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--text-dim);
-    font-weight: 600;
-  }
-
-  .stake-info {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
-  .stake-info span {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--cyan);
-    font-weight: 600;
-  }
-
-  /* TICKET ACTIONS */
-  .ticket-actions {
-    display: flex;
-    gap: 8px;
-    padding: 10px 16px;
-    border-top: 1px solid var(--border);
-  }
-
-  .btn-regen {
-    flex: 1;
-    padding: 8px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text-dim);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .btn-regen:hover { border-color: var(--text-dim); color: var(--text); }
-
-  .btn-save {
-    flex: 1;
-    padding: 8px;
-    background: var(--cyan-dim);
-    border: 1px solid rgba(0,229,200,0.3);
-    border-radius: 6px;
-    color: var(--cyan);
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .btn-save:hover { background: rgba(0,229,200,0.2); }
-
-  /* AI NOTE */
-  .ai-note {
-    margin: 0 16px 10px;
-    padding: 8px 10px;
-    background: rgba(0,229,200,0.06);
-    border-left: 2px solid var(--cyan);
-    border-radius: 0 4px 4px 0;
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
-  /* ERROR */
-  .error-msg {
-    padding: 12px 16px;
-    background: rgba(239,68,68,0.1);
-    border: 1px solid rgba(239,68,68,0.3);
-    border-radius: 8px;
-    color: #ef4444;
-    font-size: 13px;
-    margin-bottom: 12px;
-    display: none;
-  }
-
-  /* LOGIN */
-  .login-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 12px;
-  }
-
-  .login-title {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-
-  .login-sub {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 20px;
-  }
-
-  .input-group { margin-bottom: 12px; }
-
-  .input-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    display: block;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-  }
-
-  .input-field {
-    width: 100%;
-    padding: 10px 12px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-size: 13px;
-    font-family: 'Inter', sans-serif;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-
-  .input-field:focus { border-color: var(--cyan); }
-
-  .btn-login {
-    width: 100%;
-    padding: 11px;
-    background: var(--cyan);
-    color: #0d0f14;
-    border: none;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: 4px;
-  }
-
-  .login-switch {
-    text-align: center;
-    margin-top: 12px;
-    font-size: 12px;
-    color: var(--text-muted);
-  }
-
-  .login-switch a {
-    color: var(--cyan);
-    cursor: pointer;
-    text-decoration: none;
-  }
-
-  /* TABS */
-  .tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 4px;
-  }
-
-  .tab {
-    flex: 1;
-    padding: 8px;
-    text-align: center;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    border-radius: 6px;
-    color: var(--text-muted);
-    transition: all 0.15s;
-  }
-
-  .tab.active {
-    background: var(--surface2);
-    color: var(--text);
-  }
-
-  /* SECTION */
-  .section { display: none; }
-  .section.active { display: block; }
-
-  /* SAVED TICKETS */
-  .saved-ticket {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-  }
-
-  .saved-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-
-  .status-badge {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 4px;
-  }
-
-  .status-pending { background: rgba(107,114,128,0.2); color: var(--text-muted); }
-  .status-won { background: rgba(0,229,200,0.15); color: var(--cyan); }
-  .status-lost { background: rgba(239,68,68,0.15); color: var(--red); }
-
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-muted);
-    font-size: 13px;
-  }
-
-  .empty-state .icon { font-size: 32px; margin-bottom: 8px; }
-
-  /* TOKEN STORAGE */
-  .user-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-muted);
-  }
-
-  .btn-logout {
-    padding: 4px 10px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--text-muted);
-    font-size: 11px;
-    cursor: pointer;
-  }
+    --bg: #0B0E14;
+    --surface: #141925;
+    --surface-raised: #1B212F;
+    --border: #262E3F;
+    --text-primary: #E7EBF2;
+    --text-muted: #8A93A8;
+    --accent-safe: #19E0C4;
+    --accent-safe-dim: rgba(25,224,196,0.12);
+    --accent-aggr: #FF9450;
+    --accent-aggr-dim: rgba(255,148,80,0.12);
+    --accent-danger: #FF4D6D;
+    --accent-danger-dim: rgba(255,77,109,0.12);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg); height: 100%; }
+  body { color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+  .mono { font-family: ui-monospace, "SF Mono", "JetBrains Mono", Consolas, monospace; }
+  .display { font-weight: 700; letter-spacing: -0.01em; }
+
+  .app-shell { max-width: 480px; margin: 0 auto; height: 100vh; height: 100dvh; background: var(--bg);
+    position: relative; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px 14px; flex-shrink: 0; }
+  .brand { display: flex; align-items: center; gap: 8px; font-size: 19px; }
+  .brand-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent-safe); }
+  .live-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+  .pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-safe); }
+
+  .content { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 16px; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px; }
+  .card-raised { background: var(--surface-raised); border: 1px solid var(--border); border-radius: 14px; padding: 15px; }
+
+  .panel-section { margin-bottom: 16px; }
+  .panel-section:last-of-type { margin-bottom: 0; }
+  .panel-label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 8px; }
+  .panel-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .panel-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+
+  input[type="range"] { width: 100%; accent-color: var(--accent-safe); height: 28px; }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { border: 1px solid var(--border); background: transparent; color: var(--text-muted);
+    padding: 9px 14px; border-radius: 999px; font-size: 13.5px; cursor: pointer; }
+  .chip.active-safe { border-color: var(--accent-safe); background: var(--accent-safe-dim); color: var(--accent-safe); }
+  .chip.active-aggr { border-color: var(--accent-aggr); background: var(--accent-aggr-dim); color: var(--accent-aggr); }
+
+  .btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 48px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; }
+  .btn-primary { background: var(--accent-safe); color: #0B0E14; margin-top: 4px; }
+  .btn-primary:disabled { opacity: 0.5; cursor: default; }
+  .btn-ghost { background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); margin-top: 4px; }
+  .btn-ghost:hover { background: var(--surface-raised); }
+  .btn-small { min-height: 36px; font-size: 13px; }
+  .btn-saved { background: var(--surface-raised); color: var(--accent-safe); margin-top: 4px; }
+
+  .ticket-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .badge { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; padding: 4px 9px; border-radius: 7px; }
+  .badge-safe { background: var(--accent-safe-dim); color: var(--accent-safe); }
+  .badge-aggr { background: var(--accent-aggr-dim); color: var(--accent-aggr); }
+  .total-odds { font-size: 24px; font-weight: 700; text-align: right; }
+  .total-odds-label { font-size: 11px; color: var(--text-muted); text-align: right; }
+
+  .selection-row { padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .selection-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .selection-top { display: flex; align-items: center; justify-content: space-between; font-size: 14px; margin-bottom: 4px; }
+  .selection-bottom { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+
+  .prob-bar { position: relative; width: 100%; height: 6px; border-radius: 999px; background: var(--border); }
+  .prob-fill { position: absolute; top: 0; left: 0; height: 6px; border-radius: 999px; background: var(--accent-safe); }
+  .prob-tick { position: absolute; top: -3px; left: 70%; width: 1px; height: 12px; background: var(--text-muted); }
+
+  .combined-prob { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 13px; }
+  .combined-prob-value { font-weight: 700; }
+
+  .ticket-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  @media (max-width: 480px) { .ticket-actions { gap: 6px; } }
+  .btn-ghost { flex: 1; background: var(--surface-raised); color: var(--text-primary); min-height: 46px; border-radius: 12px; }
+  .btn-ghost:disabled { opacity: 0.5; cursor: default; }
+  .btn-save { flex: 1; border: none; cursor: pointer; min-height: 46px; border-radius: 12px; }
+  .btn-save:disabled { opacity: 0.4; cursor: default; }
+
+  .empty-state { text-align: center; padding: 28px 0; font-size: 13px; color: var(--text-muted); }
+
+  .live-feed { display: flex; flex-direction: column; gap: 12px; }
+  .live-row-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .live-row-match { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
+  .live-row-minute { font-size: 12px; color: var(--text-muted); }
+  .live-row-market { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .live-market-badge { font-size: 13px; padding: 2px 8px; border-radius: 6px; }
+  .live-row-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0; }
+  .live-row-stake { font-size: 12px; margin-top: 8px; font-weight: 600; }
+  .fade-in { opacity: 1; }
+
+  /* ── INTERAKTIVNÍ TOUR ── */
+  .tour-spotlight { position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.78); border: 2px solid #19E0C4; pointer-events: none; z-index: 1000; }
+  .tour-card { position: fixed; z-index: 1001; background: #141925; border: 1px solid #262E3F; border-radius: 18px; padding: 20px; max-width: 320px; width: calc(100vw - 40px); box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+  .tour-dot { width: 6px; height: 6px; border-radius: 50%; background: #262E3F; display: inline-block; }
+  .tour-dot.active { background: #19E0C4; width: 14px; border-radius: 3px; }
+  .tour-next { width: 100%; padding: 12px; background: #19E0C4; color: #0B0E14; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 14px; }
+  .tour-skip { background: none; border: none; color: #8A93A8; font-size: 12px; cursor: pointer; margin-top: 8px; width: 100%; text-align: center; display: block; padding: 4px; }
+
+  .bottom-nav { flex-shrink: 0;
+    display: flex; gap: 6px; background: var(--surface); border-top: 1px solid var(--border);
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px)); }
+  .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: none; border: none; color: var(--text-muted); font-size: 10.5px; font-weight: 600;
+    padding: 6px 0; border-radius: 14px; position: relative; cursor: pointer; transition: color .15s, background .15s; }
+  .nav-btn.active { color: var(--accent-safe); background: var(--accent-safe-dim); }
+  .nav-badge { position: absolute; top: 0; right: calc(50% - 24px); background: var(--accent-danger); color: #fff;
+    font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 999px; min-width: 16px; text-align: center; }
+
+  svg.icon { width: 14px; height: 14px; flex-shrink: 0; }
+  svg.icon-nav { width: 18px; height: 18px; flex-shrink: 0; }
+
+  .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .auth-card { width: 100%; max-width: 360px; background: var(--surface-raised); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px; }
+  .auth-toggle { display: flex; background: var(--surface); border-radius: 10px; padding: 3px; margin-bottom: 20px; }
+  .auth-toggle button { flex: 1; padding: 9px 0; border: none; background: transparent; color: var(--text-muted); font-size: 13px; border-radius: 8px; cursor: pointer; }
+  .auth-toggle button.active { background: var(--surface-raised); color: var(--text-primary); }
+  .auth-input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; color: var(--text-primary); font-size: 14px; margin-bottom: 10px;
+  }
+  .auth-input:focus { outline: none; border-color: var(--accent-safe); }
+  .auth-error { color: var(--accent-danger); font-size: 12.5px; margin: 4px 0 8px; }
+  .auth-fine { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 16px; line-height: 1.5; }
+  .logout-btn { background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; padding: 4px 8px; }
 </style>
 </head>
 <body>
+<div id="root"></div>
 
-<div class="header">
-  <div class="logo">
-    <div class="logo-dot"></div>
-    ApexSignal
-  </div>
-  <div id="headerRight">
-    <div class="live-badge">
-      <div class="live-dot"></div>
-      LIVE
-    </div>
-  </div>
-</div>
-
-<div class="container">
-
-  <!-- LOGIN VIEW -->
-  <div id="loginView">
-    <div class="login-card">
-      <div class="login-title" id="authTitle">Přihlášení</div>
-      <div class="login-sub">Přistup ke svým tiketům a signálům</div>
-
-      <div id="registerFields" style="display:none">
-        <div class="input-group">
-          <label class="input-label">EMAIL</label>
-          <input class="input-field" type="email" id="regEmail" placeholder="email@example.com">
-        </div>
-        <div class="input-group">
-          <label class="input-label">HESLO</label>
-          <input class="input-field" type="password" id="regPassword" placeholder="min. 8 znaků">
-        </div>
-        <button class="btn-login" onclick="register()">Vytvořit účet</button>
-        <div class="login-switch">Máš účet? <a onclick="showLogin()">Přihlásit se</a></div>
-      </div>
-
-      <div id="loginFields">
-        <div class="input-group">
-          <label class="input-label">EMAIL</label>
-          <input class="input-field" type="email" id="loginEmail" placeholder="email@example.com">
-        </div>
-        <div class="input-group">
-          <label class="input-label">HESLO</label>
-          <input class="input-field" type="password" id="loginPassword" placeholder="heslo">
-        </div>
-        <button class="btn-login" onclick="login()">Přihlásit se</button>
-        <div class="login-switch">Nemáš účet? <a onclick="showRegister()">Registrovat se</a></div>
-      </div>
-
-      <div class="error-msg" id="authError"></div>
-    </div>
-  </div>
-
-  <!-- MAIN VIEW -->
-  <div id="mainView" style="display:none">
-
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('generator')">Generátor</div>
-      <div class="tab" onclick="switchTab('history')">Historie</div>
-    </div>
-
-    <!-- GENERATOR SECTION -->
-    <div class="section active" id="generatorSection">
-
-      <div class="card">
-        <div class="card-title">Parametry tiketu</div>
-
-        <div class="param-row">
-          <div class="param-label">
-            Riziko
-            <span class="param-value" id="riskLabel">50%</span>
-          </div>
-          <input type="range" min="0" max="100" value="50" id="riskSlider"
-            oninput="document.getElementById('riskLabel').textContent=this.value+'%'">
-        </div>
-
-        <div class="param-row">
-          <div class="param-label">Sporty</div>
-          <div class="chips">
-            <div class="chip active-cyan" onclick="toggleChip(this,'sport')">Fotbal</div>
-            <div class="chip" onclick="toggleChip(this,'sport')">Tenis</div>
-          </div>
-        </div>
-
-        <div class="param-row">
-          <div class="param-label">Typ trhu</div>
-          <div class="chips">
-            <div class="chip active-orange" onclick="toggleChip(this,'market')">Výhra</div>
-            <div class="chip active-orange" onclick="toggleChip(this,'market')">Over gólů</div>
-            <div class="chip" onclick="toggleChip(this,'market')">Over karet</div>
-            <div class="chip" onclick="toggleChip(this,'market')">BTTS</div>
-          </div>
-        </div>
-
-        <div class="param-row" style="margin-bottom:0">
-          <div class="param-label">
-            Časový rámec
-            <span class="param-value" id="daysLabel">1 den</span>
-          </div>
-          <input type="range" min="1" max="5" value="1" id="daysSlider"
-            oninput="updateDaysLabel(this.value)">
-        </div>
-      </div>
-
-      <button class="btn-generate" id="generateBtn" onclick="generateTickets()">
-        Vygenerovat tikety →
-      </button>
-
-      <div class="loading-bar" id="loadingBar"><div class="loading-fill"></div></div>
-      <div class="loading-text" id="loadingText">Claude analyzuje zápasy…</div>
-
-      <div class="error-msg" id="genError"></div>
-
-      <div id="ticketsContainer"></div>
-
-    </div>
-
-    <!-- HISTORY SECTION -->
-    <div class="section" id="historySection">
-      <div id="historyContainer">
-        <div class="empty-state">
-          <div class="icon">🎫</div>
-          Zatím žádné uložené tikety
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
+<script>const{useState:useState,useEffect:useEffect,useRef:useRef,useCallback:useCallback}=React,API_BASE_URL="https://apexsignal-backend.onrender.com",GOOGLE_CLIENT_ID="1055928744061-din3ersdlk28lk25c96tse6s8aveikbt.apps.googleusercontent.com";function adaptBackendTicket(e){return e?{type:e.ticket_type,totalOdds:e.total_odds,combinedProb:e.combined_probability,recommendedStakePct:e.recommended_stake_pct,summary:e.summary,horizonNote:e.horizon_note||null,selections:e.selections.map(e=>({home:e.home_team,away:e.away_team,market:e.market_type+" "+e.selection,odds:e.odds,prob:e.probability,league:e.league||"",country:e.country||"",kickoff_date:e.kickoff_date||"",kickoff_time:e.kickoff_time||"",result:e.result||"pending",home_goals:e.home_goals,away_goals:e.away_goals,raw:e}))}:null}const AUTH_STORAGE_KEY="apexsignal_auth";function friendlyFetchError(e){const t=e&&e.message||"";return["load failed","failed to fetch","networkerror","network request failed","the internet connection appears to be offline","connection was lost"].some(e=>t.toLowerCase().includes(e))?"Nepodařilo se spojit se serverem — zkontroluj připojení k internetu a zkus to znovu.":t||"Něco se nepovedlo, zkus to znovu."}function getStoredAuth(){try{const e=localStorage.getItem(AUTH_STORAGE_KEY);return e?JSON.parse(e):null}catch(e){return null}}function setStoredAuth(e){try{e?localStorage.setItem(AUTH_STORAGE_KEY,JSON.stringify(e)):localStorage.removeItem(AUTH_STORAGE_KEY)}catch(e){}}function watermarkStyle(){const e=getStoredAuth(),t=(e&&e.email?e.email:"ApexSignal").replace(/[<>&]/g,"");return{backgroundImage:`url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='280' height='150'><text x='6' y='90' font-size='14' font-family='sans-serif' fill='rgba(255,255,255,0.13)' transform='rotate(-24 140 75)'>${t}</text></svg>`)}")`,backgroundRepeat:"repeat"}}async function authFetch(e,t={}){const a=getStoredAuth(),n={...t.headers||{},Authorization:`Bearer ${a?a.token:""}`},o=await fetch(e,{...t,headers:n});return 401===o.status&&(setStoredAuth(null),window.dispatchEvent(new Event("apexsignal:unauthorized"))),o}async function fetchTicketsFromBackend(e,t,a,n,o="/tickets/generate"){const r={risk_level:e,sports:t,market_types:a,time_frame_days:n},l=await authFetch(`${API_BASE_URL}${o}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});if(!l.ok){const e=await l.json().catch(()=>null);throw new Error(e?.detail||"Backend vrátil chybu: "+l.status)}const i=await l.json();return{safe:adaptBackendTicket(i.safe),aggressive:adaptBackendTicket(i.aggressive)}}const IconRefresh=({spinning:e})=>React.createElement("svg",{className:"icon",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2",style:e?{animation:"spin 1s linear infinite"}:{}},React.createElement("path",{d:"M21 12a9 9 0 1 1-2.64-6.36",strokeLinecap:"round"}),React.createElement("polyline",{points:"21 3 21 9 15 9"})),IconCheck=()=>React.createElement("svg",{className:"icon",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2.5"},React.createElement("polyline",{points:"20 6 9 17 4 12",strokeLinecap:"round",strokeLinejoin:"round"})),IconBookmark=()=>React.createElement("svg",{className:"icon",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2"},React.createElement("path",{d:"M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z",strokeLinejoin:"round"})),IconTicket=({nav:e})=>React.createElement("svg",{className:e?"icon-nav":"icon",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2"},React.createElement("path",{d:"M2 9a3 3 0 1 0 0 6v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3a3 3 0 1 1 0-6V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z",strokeLinejoin:"round"})),IconHistory=({nav:e})=>React.createElement("svg",{className:e?"icon-nav":"icon",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2"},React.createElement("circle",{cx:"12",cy:"12",r:"9"}),React.createElement("path",{d:"M12 7v5l3 3",strokeLinecap:"round"})),IconAnalyze=({nav:e})=>React.createElement("svg",{className:e?"icon-nav":"icon",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2"},React.createElement("path",{d:"M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4",strokeLinecap:"round"}),React.createElement("path",{d:"M9 3v4a2 2 0 0 0 2 2h4",strokeLinecap:"round"}),React.createElement("path",{d:"M15 3l6 6",strokeLinecap:"round"}),React.createElement("circle",{cx:"17",cy:"17",r:"3"}),React.createElement("path",{d:"M21 21l-1.5-1.5",strokeLinecap:"round"})),SPORTS=[{id:"football",label:"Fotbal"}],MARKETS_BY_SPORT={football:[{id:"match_winner",label:"Výhra"},{id:"over_goals",label:"Over gólů"},{id:"btts",label:"Oba dají gól"},{id:"over_cards",label:"Over karet"}],tennis:[{id:"match_winner",label:"Výhra"},{id:"over_games",label:"Over gamů"},{id:"over_aces",label:"Over es"}],hockey:[{id:"match_winner",label:"Výhra"},{id:"over_goals",label:"Over gólů"},{id:"over_penalty_minutes",label:"Over trestných minut"}],basketball:[{id:"match_winner",label:"Výhra"},{id:"over_points",label:"Over bodů"},{id:"over_threes",label:"Over trojek"}]};function getAvailableMarkets(e){const t=new Map;return e.forEach(e=>(MARKETS_BY_SPORT[e]||[]).forEach(e=>{t.has(e.id)||t.set(e.id,e)})),Array.from(t.values())}const DEMO_MATCH_POOL=[{sport:"football",marketType:"match_winner",home:"Bayern",away:"Augsburg",market:"Výhra domácích",odds:1.32,prob:.84},{sport:"football",marketType:"match_winner",home:"Man City",away:"Sheffield",market:"Výhra domácích",odds:1.27,prob:.86},{sport:"football",marketType:"over_goals",home:"PSG",away:"Lorient",market:"Over 2.5 gólů",odds:1.55,prob:.79},{sport:"football",marketType:"over_cards",home:"Real Madrid",away:"Almeria",market:"Over 3.5 karet",odds:1.95,prob:.74},{sport:"football",marketType:"match_winner",home:"Inter",away:"Salernitana",market:"Výhra domácích",odds:1.3,prob:.81},{sport:"football",marketType:"over_goals",home:"Dortmund",away:"Mainz",market:"Over 2.5 gólů",odds:1.7,prob:.77},{sport:"football",marketType:"match_winner",home:"Arsenal",away:"Burnley",market:"Výhra domácích",odds:1.4,prob:.83},{sport:"football",marketType:"over_cards",home:"Napoli",away:"Empoli",market:"Over 3.5 karet",odds:2.05,prob:.72},{sport:"tennis",marketType:"match_winner",home:"Sinner",away:"Bublik",market:"Vítěz zápasu",odds:1.25,prob:.85},{sport:"tennis",marketType:"match_winner",home:"Alcaraz",away:"Rune",market:"Vítěz zápasu",odds:1.3,prob:.82},{sport:"tennis",marketType:"over_games",home:"Djokovic",away:"Fritz",market:"Over 21.5 gamů",odds:1.75,prob:.78},{sport:"tennis",marketType:"over_aces",home:"Sabalenka",away:"Krejčíková",market:"Over 8.5 es",odds:1.85,prob:.76},{sport:"hockey",marketType:"match_winner",home:"Sparta",away:"Třinec",market:"Výhra domácích",odds:1.55,prob:.8},{sport:"hockey",marketType:"over_goals",home:"Pardubice",away:"Liberec",market:"Over 5.5 gólů",odds:1.7,prob:.77},{sport:"hockey",marketType:"over_penalty_minutes",home:"Olomouc",away:"Brno",market:"Over 8.5 trestných minut",odds:1.9,prob:.73},{sport:"basketball",marketType:"match_winner",home:"Lakers",away:"Pistons",market:"Výhra domácích",odds:1.2,prob:.87},{sport:"basketball",marketType:"over_points",home:"Celtics",away:"Hornets",market:"Over 225.5 bodů",odds:1.65,prob:.8},{sport:"basketball",marketType:"over_threes",home:"Nuggets",away:"Wizards",market:"Over 24.5 trojek",odds:1.8,prob:.75}];function buildMockTicket(e,t,a,n=[]){const o="safe"===e?[2,5]:[5,10],r=DEMO_MATCH_POOL.filter(e=>t.includes(e.sport)&&a.includes(e.marketType)&&!n.includes(e.home+"-"+e.away)).sort(()=>Math.random()-.5),l=[];let i=1;for(const e of r){const t=i*e.odds;if(!(t>o[1]&&l.length>0)&&(l.push(e),i=t,i>=o[0]&&i<=o[1]))break}if(i<o[0]||i>o[1])return null;const c=l.reduce((e,t)=>e*t.prob,1);return{type:e,selections:l,totalOdds:i,combinedProb:c}}function ProbabilityBar({value:e}){const t=Math.round(100*e);return React.createElement("div",{className:"prob-bar"},React.createElement("div",{className:"prob-fill",style:{width:t+"%",background:"var(--accent-safe)"}}),React.createElement("div",{className:"prob-tick"}))}function Chip({label:e,active:t,variant:a,onClick:n}){return React.createElement("button",{onClick:n,className:"chip"+(t?" active-"+a:"")},e)}function InfoTooltip({text:e}){const[t,a]=React.useState(!1);return React.createElement("span",{style:{position:"relative",display:"inline-flex",verticalAlign:"middle"}},React.createElement("button",{onClick:e=>{e.stopPropagation(),a(e=>!e)},"aria-label":"Vysvětlení statistiky",style:{background:"none",border:"none",color:"var(--text-muted)",cursor:"pointer",fontSize:12,padding:0,lineHeight:1,width:14,height:14,display:"inline-flex",alignItems:"center",justifyContent:"center"}},"ⓘ"),t&&React.createElement(React.Fragment,null,React.createElement("div",{onClick:()=>a(!1),style:{position:"fixed",inset:0,zIndex:999,background:"rgba(0,0,0,0.4)"}}),React.createElement("div",{style:{position:"fixed",left:"50%",bottom:"calc(76px + env(safe-area-inset-bottom, 0px))",transform:"translateX(-50%)",width:"min(280px, calc(100vw - 40px))",background:"var(--surface-raised)",border:"1px solid var(--border)",borderRadius:12,padding:"12px 14px",fontSize:12.5,lineHeight:1.55,fontWeight:400,color:"var(--text-primary)",zIndex:1e3,boxShadow:"0 12px 32px rgba(0,0,0,.6)",textAlign:"left",whiteSpace:"normal"}},e)))}function SelectionRow({s:e,i:t,accentVar:a,onRemove:n,onOddsChange:o}){const[r,l]=React.useState(!1),[i,c]=React.useState(!1),[s,d]=React.useState(e.odds.toFixed(2)),m=e.raw&&(e.raw.reasoning||e.raw.data_quality);return React.createElement("div",{className:"selection-row"},React.createElement("div",{className:"selection-top",style:{cursor:m?"pointer":"default"},onClick:()=>!i&&m&&l(e=>!e)},React.createElement("div",{style:{minWidth:0,flex:1}},React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},React.createElement("span",{style:{fontSize:13,fontWeight:600,wordBreak:"break-word"}},e.home," – ",e.away),e.manual&&React.createElement("span",{style:{fontSize:9,fontWeight:700,color:"var(--accent-aggr)",background:"rgba(255,148,80,0.15)",padding:"1px 5px",borderRadius:4,flexShrink:0}},"vlastní"))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},i?React.createElement("input",{type:"number",step:"0.01",value:s,onChange:e=>d(e.target.value),onBlur:()=>{o&&o(t,parseFloat(s)),c(!1)},onKeyDown:e=>{"Enter"===e.key&&(o&&o(t,parseFloat(s)),c(!1))},autoFocus:!0,style:{width:64,background:"var(--surface-raised)",border:"1px solid var(--accent-safe)",borderRadius:6,padding:"3px 6px",color:"var(--text-primary)",fontSize:13,fontVariantNumeric:"tabular-nums"},onClick:e=>e.stopPropagation()}):React.createElement(React.Fragment,null,React.createElement("span",{className:"mono"},e.odds.toFixed(2)),e.result&&"pending"!==e.result&&(void 0!==e.home_goals||void 0!==e.away_goals)&&React.createElement("span",{style:{fontSize:12,fontWeight:600,color:"var(--text-muted)"}},"· ",e.home_goals,"-",e.away_goals),e.result&&"pending"!==e.result&&React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"won"===e.result?"var(--accent-safe)":"var(--accent-danger)"}},"won"===e.result?"✓":"✗"),React.createElement("button",{onClick:e=>{e.stopPropagation(),c(!0)},title:"Upravit kurz",style:{background:"none",border:"none",color:"var(--text-muted)",cursor:"pointer",fontSize:12,padding:"0 2px"}},"✏️")),n&&React.createElement("div",{style:{display:"flex",gap:6}},React.createElement("button",{onClick:t=>{t.stopPropagation(),n(e,!0)},title:"Vyměnit za jiný zápas",style:{background:"var(--surface-raised)",border:"1px solid var(--border)",borderRadius:8,color:"var(--text-primary)",cursor:"pointer",fontSize:16,width:30,height:30,display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}},"🔄"),React.createElement("button",{onClick:t=>{t.stopPropagation(),n(e,!1)},title:"Odebrat bez náhrady",style:{background:"rgba(255,77,109,0.12)",border:"1px solid var(--accent-danger)",borderRadius:8,color:"var(--accent-danger)",cursor:"pointer",fontSize:16,fontWeight:700,width:30,height:30,display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}},"✕")),m&&React.createElement("button",{onClick:e=>{e.stopPropagation(),l(e=>!e)},title:r?"Skrýt zdůvodnění":"Zobrazit zdůvodnění výběru",style:{background:"var(--surface-raised)",border:"1px solid var(--border)",borderRadius:8,color:"var(--text-muted)",cursor:"pointer",fontSize:16,width:30,height:30,display:"flex",alignItems:"center",justifyContent:"center",transition:"transform .2s",transform:r?"rotate(180deg)":"rotate(0deg)"}},"▾"))),(e.league||e.country)&&React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginTop:2,opacity:.7}},[e.country,e.league].filter(Boolean).join(" · "),e.kickoff_date&&React.createElement("span",{style:{marginLeft:6}},"· ",e.kickoff_date,e.kickoff_time&&` ${e.kickoff_time}`)),React.createElement("div",{className:"selection-bottom"},React.createElement("span",null,e.market),React.createElement("span",{className:"mono"},Math.round(100*e.prob),"%")),React.createElement(ProbabilityBar,{value:e.prob}),r&&m&&React.createElement("div",{style:{marginTop:10,padding:"10px 12px",background:"var(--surface)",borderRadius:8,borderLeft:`2px solid ${a}`}},e.raw.reasoning&&React.createElement("div",{style:{fontSize:12,color:"var(--text-primary)",lineHeight:1.5,marginBottom:e.raw.data_quality?8:0}},e.raw.reasoning),e.raw.data_quality&&React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",lineHeight:1.4}},e.raw.data_quality)))}function _buildGenerationLogSteps(){const e=(e,t)=>e+Math.floor(Math.random()*(t-e+1)),t=e(140,260);return["> připojuji se k datovému feedu…",`> stahuji rozpis zápasů z ${e(28,36)} soutěží…`,`> nalezeno ${t} zápasů ve zvoleném horizontu…`,"> stahuji sestavy, zranění a formu týmů…","> počítám pravděpodobnostní model pro každý zápas…",`> porovnávám odhad s kurzy od ${e(8,16)} bookmakerů…`,"> zohledňuji odpočinek mezi zápasy…","> počítám motivaci podle tabulky soutěže…",`> ${e(60,140)} zápasů prošlo filtrem na jistotu výsledku…`,"> odstraňuji zápasy, co už máš v jiných tiketech…",`> ${e(15,40)} kandidátů zbývá po zpřísnění…`,`> zkouším kombinace výběrů (${e(400,3200)}. možnost)…`,"> hledám kombinaci v cílovém rozsahu kurzu…","> ověřuji, že výběry na sobě nejsou závislé…","> počítám korelaci mezi soutěžemi a termíny…","> počítám doporučenou výši vkladu…","> kontroluji duplicity s historií tiketů…","> sestavuji finální tiket…"]}function GeneratingConsole({serverWaking:e}){const t=React.useRef(_buildGenerationLogSteps()),[a,n]=React.useState([t.current[0]]);return React.useEffect(()=>{let e=0;const a=setInterval(()=>{e+=1,e>=t.current.length&&(t.current=_buildGenerationLogSteps(),e=0),n(a=>[...a,t.current[e]].slice(-4))},1600);return()=>clearInterval(a)},[]),React.createElement("div",{style:{fontFamily:"'SF Mono', 'Fira Code', 'Courier New', monospace",background:"#04140a",border:"1px solid #16381f",borderRadius:10,padding:"14px 16px",color:"#4ade80",fontSize:12.5,lineHeight:1.9,textAlign:"left"}},a.map((e,t)=>React.createElement("div",{key:t,style:{opacity:t===a.length-1?1:.4-.05*(a.length-1-t)}},e,t===a.length-1&&React.createElement("span",{style:{animation:"blink 1s step-start infinite"}},"▋"))))}function TicketCard({ticket:e,accent:t,label:a,onRegenerate:n,onSave:o,loading:r,saved:l,saving:i,replacing:c,serverWaking:s,onRemoveSelection:d,onOddsChange:m}){const p="safe"===t?"var(--accent-safe)":"var(--accent-aggr)",u="safe"===t?"badge badge-safe":"badge badge-aggr",[v,g]=React.useState(""),[y,f]=React.useState(e?.totalOdds?.toFixed(2)||""),[h,k]=React.useState(!1),[b,R]=React.useState([]),[E,x]=React.useState(!1),S=e&&e.selections?e.selections.map(e=>e.match_id).join(","):"";return React.useEffect(()=>{e&&e.selections&&e.selections.length>0&&(x(!0),authFetch(`${API_BASE_URL}/tickets/check-duplicates`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections:e.selections.map(e=>({match_id:e.match_id,home_team:e.home,away_team:e.away}))})}).then(e=>e.json()).then(e=>{e.has_duplicates&&(R(e.duplicates),k(!0))}).catch(e=>console.warn("Duplicate check error:",e)).finally(()=>x(!1)))},[S]),React.createElement("div",{className:"card fade-in",style:e?watermarkStyle():void 0},React.createElement("div",{className:"ticket-header"},React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},React.createElement("span",{className:u},a),e&&React.createElement("span",{className:"mono",style:{fontSize:12,color:"var(--text-muted)"}},e.selections.length," tipy")),e&&React.createElement("div",null,React.createElement("div",{className:"mono total-odds",style:{color:p}},e.totalOdds.toFixed(2)),React.createElement("div",{className:"total-odds-label"},"celkový kurz"))),!e&&React.createElement("div",{className:"empty-state"},r?React.createElement(GeneratingConsole,{serverWaking:s}):React.createElement(React.Fragment,null,"Appka pro tenhle výběr dní už nic lepšího nenajde — buď jsi z těch zápasů už většinu vsadil a uložil (appka stejný zápas do dalšího tiketu znovu nenabídne), nebo appka teď prostě nevidí žádnou kombinaci, které by věřila víc než trh.",React.createElement("br",null),React.createElement("br",null),"Zkus: ",React.createElement("strong",null,"rozšířit počet dní")," (přidá zápasy z dalších dní, které appka ještě nenabízela), ",React.createElement("strong",null,"zaškrtnout víc sportů nebo trhů")," (víc příležitostí), nebo to zkus ",React.createElement("strong",null,"znovu za chvíli")," — kurzy i nabídka zápasů se průběžně mění.")),e&&e.horizonNote&&React.createElement("div",{style:{margin:"0 16px 12px",padding:"10px 12px",background:"var(--accent-aggr-dim)",border:"1px solid var(--accent-aggr)",borderRadius:10,fontSize:12,color:"var(--text-primary)",lineHeight:1.5}},"⏱️ ",e.horizonNote),e&&e.selections.map((e,t)=>React.createElement(SelectionRow,{key:t,s:e,i:t,accentVar:p,onRemove:d,onOddsChange:m?(e,t)=>m(e,t):null})),c&&React.createElement("div",{style:{padding:"10px 16px",fontSize:12,color:"var(--text-muted)",display:"flex",alignItems:"center",gap:8}},React.createElement("span",{style:{display:"inline-block",animation:"spin .8s linear infinite"}},"⟳"),"Hledám náhradní zápas…"),e&&React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",padding:"6px 16px 2px",lineHeight:1.5,opacity:.7}},"ℹ️ Každý výběr prošel statistickým modelem — appka vybírá jen zápasy kde má model vysokou důvěru ve výsledek."),e&&!l&&React.createElement("div",{style:{padding:"10px 16px 4px",display:"flex",gap:10}},React.createElement("div",{style:{flex:1}},React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",marginBottom:4,fontWeight:600}},"Kurz tiketu"),React.createElement("input",{type:"number",step:"0.01",min:"0",placeholder:e?.totalOdds?.toFixed(2)||"kurz",value:y,onChange:e=>f(e.target.value),style:{width:"100%",background:"var(--surface-raised)",border:"1px solid var(--border)",borderRadius:10,padding:"12px 12px",color:"var(--text-primary)",fontSize:16,fontWeight:700,fontVariantNumeric:"tabular-nums",boxSizing:"border-box"}})),React.createElement("div",{style:{flex:1}},React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",marginBottom:4,fontWeight:600}},"Sázka (Kč)"),React.createElement("input",{type:"number",step:"10",min:"0",placeholder:"volitelné",value:v,onChange:e=>g(e.target.value),style:{width:"100%",background:"var(--surface-raised)",border:`1.5px solid ${p}`,borderRadius:10,padding:"12px 12px",color:"var(--text-primary)",fontSize:16,fontWeight:700,fontVariantNumeric:"tabular-nums",boxSizing:"border-box"}}))),React.createElement("div",{className:"ticket-actions",style:{alignItems:"center"}},React.createElement("button",{onClick:n,disabled:r,className:"btn btn-ghost",title:"Regenerovat tiket",style:{width:"auto",minWidth:"auto",minHeight:"auto",height:40,padding:"0 14px",fontSize:14,borderRadius:12}},React.createElement(IconRefresh,{spinning:r})),React.createElement("button",{onClick:()=>o(v?parseFloat(v):null,y?parseFloat(y):null),disabled:!e||i,className:"btn btn-save",style:{background:l?"var(--surface-raised)":p,color:l?p:"#0B0E14",opacity:e?1:.5,flex:"none",width:"auto",minHeight:"auto",height:40,padding:"0 18px",fontSize:14,minWidth:100,whiteSpace:"nowrap",textOverflow:"ellipsis",overflow:"hidden"}},l?React.createElement(IconCheck,null):React.createElement(IconBookmark,null)," ",React.createElement("span",null,i?"…":l?"Uloženo":"Uložit"))),h&&React.createElement("div",{style:{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:1e3}},React.createElement("div",{style:{background:"var(--surface)",borderRadius:12,padding:24,maxWidth:400,boxShadow:"0 8px 32px rgba(0,0,0,0.3)",border:"1px solid var(--border)"}},React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:12,display:"flex",alignItems:"center",gap:8,color:"var(--accent-danger)"}},"⚠️ Upozornění: Duplikátní zápasy!"),React.createElement("div",{style:{fontSize:13,color:"var(--text-secondary)",marginBottom:16,lineHeight:1.5}},"Následující zápasy máš už vsazeny v ",React.createElement("strong",null,"PENDING tiketu"),":"),React.createElement("div",{style:{background:"var(--surface-raised)",borderRadius:8,padding:12,marginBottom:16,maxHeight:200,overflowY:"auto"}},b.map((e,t)=>React.createElement("div",{key:t,style:{fontSize:12,padding:"8px 0",borderBottom:t<b.length-1?"1px solid var(--border)":"none",color:"var(--text-primary)"}},e.home_team," ",React.createElement("span",{style:{color:"var(--text-muted)"}},"vs")," ",e.away_team))),React.createElement("div",{style:{display:"flex",gap:8}},React.createElement("button",{onClick:()=>{k(!1)},style:{flex:1,padding:"10px 16px",background:"var(--accent-safe)",color:"white",border:"none",borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:600}},"✓ OK, Vsadím"),React.createElement("button",{onClick:()=>{k(!1),R([]),x(!1),n&&n()},style:{flex:1,padding:"10px 16px",background:"var(--surface-raised)",color:"var(--text-primary)",border:"1px solid var(--border)",borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:600}},"🔄 Regenerovat")))))}function downloadCanvas(e){const t=document.createElement("a");t.download="apexsignal-tiket.png",t.href=e.toDataURL("image/png"),t.click()}const RISK_OPTIONS=[{value:20,icon:"🛡️",label:"Krátký",desc:"2–3 výběry, kurz kolem 2–3",tokenType:"kratky"},{value:50,icon:"⚖️",label:"Střední",desc:"3–5 výběrů, kurz kolem 3–6",tokenType:"stredni"},{value:80,icon:"🔥",label:"BOOST",desc:"TOP výběry, kurz 10–15 (5 dní)",tokenType:"boost"}];function TransparencyTicketRow({ticket:e}){const t=e.created_at?new Date(e.created_at):null,a=t?t.toLocaleDateString("cs-CZ",{day:"numeric",month:"numeric",year:"numeric"}):"",n="won"===e.status||"lost"===e.status,o="won"===e.status,r=n?o?"var(--accent-safe)":"var(--accent-danger)":"var(--text-muted)",l=n?o?"✓ VYHRÁNO":"✗ PROHRÁNO":"· ČEKÁ NA VYHODNOCENÍ",i={kratky:"Krátký",stredni:"Střední",boost:"BOOST",dlouhy:"Dlouhý"}[e.ticket_type]||e.ticket_type;return React.createElement("div",{style:{background:"var(--surface)",border:"1px solid var(--border)",borderLeft:`3px solid ${r}`,borderRadius:10,padding:14,marginBottom:12}},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,paddingBottom:10,borderBottom:"1px solid var(--border)"}},React.createElement("span",{style:{fontSize:12,color:"var(--text-muted)"}},a," · ",i," · ",e.selection_count," tipy"),React.createElement("span",{style:{color:r,fontWeight:700,fontSize:12}},l)),n&&e.selections?React.createElement("div",{style:{fontSize:13,color:"var(--text-secondary)",lineHeight:1.7,marginBottom:10}},e.selections.map((e,t)=>React.createElement("div",{key:t},e.home_team," – ",e.away_team," ",React.createElement("span",{style:{color:"var(--text-muted)"}},"(",e.market_type," ",e.selection,")")))):React.createElement("div",{style:{fontSize:13,color:"var(--text-muted)",fontStyle:"italic",marginBottom:10}},'Konkrétní zápasy appka odhalí, až tiket appka vyhodnotí — ať appka nikomu neumožní si "okopírovat" tip předem.'),React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:13,paddingTop:10,borderTop:"1px solid var(--border)"}},React.createElement("span",{className:"mono",style:{fontWeight:700,color:"var(--text-primary)"}},"kurz ",e.total_odds.toFixed(2)),null!=e.stake&&React.createElement("span",{style:{color:"var(--text-muted)"}},"vklad ",Math.round(e.stake)," Kč"),n&&null!=e.profit&&React.createElement("span",{style:{color:r,fontWeight:700}},e.profit>=0?"+":"",Math.round(e.profit)," Kč")))}function TransparencySection(){const[e,t]=React.useState(!1),[a,n]=React.useState(null),[o,r]=React.useState(!1),[l,i]=React.useState(!1),[c,s]=React.useState(!1);React.useEffect(()=>{e&&!c&&(r(!0),fetch(`${API_BASE_URL}/public/transparency?limit=200`).then(e=>e.json()).then(e=>n(e)).catch(()=>i(!0)).finally(()=>{r(!1),s(!0)}))},[e,c]);const d=a&&a.stats;return React.createElement("div",{className:"card",style:{marginBottom:12,borderColor:"var(--accent-safe)"}},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer"},onClick:()=>t(e=>!e)},React.createElement("div",null,React.createElement("div",{className:"panel-title",style:{margin:0}},"🔍 Transparentní účet ApexSignalu"),!e&&React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginTop:2}},"Appka tady ukazuje úplně vše — výhry i prohry. Klikni pro otevření.")),React.createElement("span",{style:{color:"var(--text-muted)",fontSize:13,flexShrink:0,marginLeft:8}},e?"Zavřít ▲":"Otevřít ▾")),e&&React.createElement("div",{style:{marginTop:14}},o&&React.createElement("div",{style:{fontSize:13,color:"var(--text-muted)"}},"Načítám…"),!o&&l&&React.createElement("div",{style:{fontSize:13,color:"var(--text-muted)"}},"Nepodařilo se načíst — zkus to prosím znovu za chvíli."),!o&&!l&&d&&React.createElement("div",{style:{background:"var(--surface-raised)",borderRadius:10,padding:16,marginBottom:14}},React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,textAlign:"center"}},React.createElement("div",null,React.createElement("div",{style:{fontSize:19,fontWeight:800,color:d.total_profit>=0?"var(--accent-safe)":"var(--accent-danger)"}},null!=d.total_profit?`${d.total_profit>=0?"+":""}${Math.round(d.total_profit)} Kč`:"—"),React.createElement("div",{style:{fontSize:10,color:"var(--text-muted)",marginTop:2}},"Zisk/Ztráta")),React.createElement("div",null,React.createElement("div",{style:{fontSize:19,fontWeight:800}},null!=d.win_rate_pct?`${d.win_rate_pct}%`:"—"),React.createElement("div",{style:{fontSize:10,color:"var(--text-muted)",marginTop:2}},"Úspěšnost")),React.createElement("div",null,React.createElement("div",{style:{fontSize:19,fontWeight:800,color:d.roi_pct>=0?"var(--accent-safe)":"var(--accent-danger)"}},null!=d.roi_pct?`${d.roi_pct>=0?"+":""}${d.roi_pct}%`:"—"),React.createElement("div",{style:{fontSize:10,color:"var(--text-muted)",marginTop:2}},"ROI"))),React.createElement("div",{style:{marginTop:12,paddingTop:12,borderTop:"1px solid var(--border)",textAlign:"center",fontSize:11,color:"var(--text-muted)"}},d.resolved_count," vyhodnocených tiketů (",d.won_count," výher) · appka na každý tiket vsází pevných 500 Kč")),!o&&!l&&a&&a.tickets.map(e=>React.createElement(TransparencyTicketRow,{key:e.ticket_id,ticket:e})),!o&&!l&&a&&0===a.tickets.length&&React.createElement("div",{style:{fontSize:13,color:"var(--text-muted)"}},"Appka zatím žádné tikety nemá — první přibudou brzy.")))}function TicketsView(e){const{riskLevel:t,setRiskLevel:a,selectedSports:n,toggleSport:o,selectedMarkets:r,toggleMarket:l,timeFrame:i,setTimeFrame:c,customDate:s,setCustomDate:d,dateRange:m,setDateRange:p,tokenPrices:u,generate:v,loadingType:g,tickets:y,regenerate:f,saveTicket:h,savedTypes:k,savingTypes:b,serverWaking:R,removeSelection:E,updateSelectionOdds:x}=e,S=t<=30?"Krátký · 2–3.5":t<=60?"Střední · 3.5–6":"BOOST · TOP",z=t<=30||t<=60?"safe":"aggr";return React.createElement(React.Fragment,null,React.createElement(TransparencySection,null),React.createElement("div",{className:"card"},React.createElement("div",{className:"panel-title"},"Parametry tiketu"),React.createElement("div",{className:"panel-section"},React.createElement("span",{className:"panel-label"},"Délka tiketu"),React.createElement("div",{style:{display:"flex",gap:8,marginTop:4}},RISK_OPTIONS.map(e=>React.createElement("button",{key:e.value,onClick:()=>a(e.value),style:{flex:1,padding:"10px 6px",borderRadius:12,cursor:"pointer",border:"1.5px solid "+(t===e.value?"var(--accent-safe)":"var(--border)"),background:t===e.value?"var(--accent-safe-dim)":"var(--surface)",color:"var(--text-primary)",textAlign:"center",transition:"all .15s"}},React.createElement("div",{style:{fontSize:20,marginBottom:4}},e.icon),React.createElement("div",{style:{fontSize:13,fontWeight:600,marginBottom:3}},e.label),React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",lineHeight:1.3}},e.desc),u&&React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"var(--accent-safe)",marginTop:4}},"🎟️ ",u.costs[e.tokenType])))),80===t&&React.createElement("div",{style:{marginTop:12,padding:"8px 12px",background:"rgba(25,224,196,0.1)",borderRadius:8,borderLeft:"3px solid var(--accent-safe)",fontSize:13,color:"var(--text-primary)",lineHeight:1.5}},React.createElement("strong",null,"🔥 BOOST")," TOP výběry s kurzem 10-15 (5denní horizont)",React.createElement("br",null),"Ze VŠECH trhů (výhra, oba gól, over 1.5+, atd.)",React.createElement("br",null),"Všechno se nastaví automaticky")),80!==t&&React.createElement(React.Fragment,null,React.createElement("div",{className:"panel-section"},React.createElement("span",{className:"panel-label"},"Sporty"),React.createElement("div",{className:"chip-row"},SPORTS.map(e=>React.createElement(Chip,{key:e.id,label:e.label,variant:"safe",active:n.includes(e.id),onClick:()=>o(e.id)})))),React.createElement("div",{className:"panel-section"},React.createElement("span",{className:"panel-label"},"Typ trhu"),React.createElement("div",{className:"chip-row"},getAvailableMarkets(n).map(e=>React.createElement(Chip,{key:e.id,label:e.label,variant:"aggr",active:r.includes(e.id),onClick:()=>l(e.id)})))),React.createElement("div",{className:"panel-section"},React.createElement("span",{className:"panel-label"},"Časový rámec"),React.createElement("div",{className:"timeframe-row",style:{display:"flex",gap:8,marginTop:4}},[1,2,3,4].map(e=>React.createElement("button",{key:e,onClick:()=>{c(e),d(null),p(null)},style:{flex:1,padding:"10px 0",borderRadius:10,cursor:"pointer",textAlign:"center",border:"1.5px solid "+(i===e?"var(--accent-safe)":"var(--border)"),background:i===e?"var(--accent-safe-dim)":"var(--surface)",color:i===e?"var(--accent-safe)":"var(--text-muted)",fontSize:13,fontWeight:600,transition:"all .15s"}},e," ",1===e?"den":"dny"))))),80===t&&React.createElement("div",{className:"panel-section"},React.createElement("div",{style:{padding:"8px 12px",background:"var(--surface-raised)",borderRadius:8,fontSize:13,color:"var(--text-primary)",lineHeight:1.5}},React.createElement("strong",null,"Auto nastavení:"),React.createElement("br",null),"⏱️ Časový rámec: 5 dní",React.createElement("br",null),"🎯 Typ trhu: Výhra",React.createElement("br",null),"⚽ Sporty: Fotbal")),React.createElement("button",{onClick:v,disabled:"both"===g,className:"btn btn-primary",style:{background:80===t?"var(--accent-safe)":void 0,width:"auto",minHeight:"auto",margin:"18px auto 0",padding:"12px 30px",fontSize:14,borderRadius:14}},80===t?"Vygenerovat BOOST tiket 🔥":"Vygenerovat tiket →")),React.createElement(TicketCard,{ticket:y.safe,accent:z,label:S,loading:"safe"===g||"both"===g,replacing:"replacing"===g,serverWaking:R,onRegenerate:()=>f("safe"),onSave:e=>h("safe",e),saved:!!k.safe,saving:!!b?.safe,onRemoveSelection:E,onOddsChange:x}))}function MiniLineChart({history:e}){if(!e||e.length<2)return null;const t=e.map(e=>e.cumulative_profit_loss),a=Math.min(0,...t),n=Math.max(0,...t)-a||1,o=e=>74-(e-a)/n*68,r=t.map((e,a)=>`${(e=>6+e/(t.length-1)*288)(a)},${o(e)}`).join(" "),l=t[t.length-1]>=0?"var(--accent-safe)":"var(--accent-danger)";return React.createElement("svg",{viewBox:"0 0 300 80",style:{width:"100%",height:80,marginTop:8}},React.createElement("line",{x1:6,y1:o(0),x2:294,y2:o(0),stroke:"var(--border)",strokeDasharray:"4 4",strokeWidth:"1"}),React.createElement("polyline",{points:r,fill:"none",stroke:l,strokeWidth:"2"}))}function StakeForm({defaultOdds:e,onSubmit:t}){const[a,n]=React.useState(e?String(e):""),[o,r]=React.useState(""),l={width:84,background:"var(--surface-raised)",border:"1px solid var(--border)",borderRadius:6,padding:"6px 8px",color:"var(--text-primary)",fontSize:13};return React.createElement("div",{className:"selection-row",style:{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}},React.createElement("input",{type:"number",step:"0.01",placeholder:"Tvůj kurz",value:a,onChange:e=>n(e.target.value),className:"mono",style:l}),React.createElement("input",{type:"number",step:"1",placeholder:"Částka",value:o,onChange:e=>r(e.target.value),className:"mono",style:l}),React.createElement("button",{className:"btn btn-primary",style:{margin:0,padding:"6px 12px"},disabled:!a||!o,onClick:()=>t(parseFloat(o),parseFloat(a))},"Uložit sázku"))}function StakeFormEditable({stakeAmount:e,stakeOdds:t,profitLoss:a,status:n,onSubmit:o}){const[r,l]=React.useState(!e),[i,c]=React.useState(t?String(parseFloat(t).toFixed(2)):""),[s,d]=React.useState(e?String(e):""),[m,p]=React.useState(!1);return r?React.createElement("div",{style:{background:"var(--surface-raised)",borderRadius:10,padding:"10px 12px"}},React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginBottom:6}},e?"Upravit sázku":"Zadat sázku"),React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}},React.createElement("input",{type:"number",step:"0.01",placeholder:"Kurz",value:i,onChange:e=>c(e.target.value),style:{width:80,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:8,padding:"8px 10px",color:"var(--text-primary)",fontSize:13}}),React.createElement("input",{type:"number",step:"10",placeholder:"Částka (Kč)",value:s,onChange:e=>d(e.target.value),style:{flex:1,minWidth:100,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:8,padding:"8px 10px",color:"var(--text-primary)",fontSize:13}}),React.createElement("button",{onClick:()=>{i&&s&&(p(!0),Promise.resolve(o(parseFloat(s),parseFloat(i))).finally(()=>{p(!1),l(!1)}))},disabled:!i||!s||m,className:"btn btn-primary",style:{margin:0,padding:"8px 14px",fontSize:13}},m?"…":"Uložit"),e&&React.createElement("button",{onClick:()=>l(!1),style:{background:"none",border:"none",color:"var(--text-muted)",cursor:"pointer",fontSize:12,padding:"8px 4px"}},"Zrušit"))):React.createElement("div",{style:{background:"var(--surface-raised)",borderRadius:10,padding:"10px 12px"}},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},React.createElement("div",null,React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginBottom:2}},"Vsazeno"),React.createElement("div",{style:{fontSize:15,fontWeight:700}},e," Kč ",React.createElement("span",{style:{fontSize:12,color:"var(--text-muted)",fontWeight:400}},"@ ",parseFloat(t).toFixed(2)))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12}},null!=a&&React.createElement("div",{style:{fontSize:16,fontWeight:800,color:a>=0?"var(--accent-safe)":"var(--accent-danger)"}},a>=0?"+":"",a," Kč"),React.createElement("button",{onClick:()=>l(!0),style:{background:"none",border:"1px solid var(--border)",borderRadius:8,padding:"5px 10px",color:"var(--text-muted)",cursor:"pointer",fontSize:12}},"✏️ Upravit"))))}function StatCard({label:e,value:t,color:a,sub:n}){return React.createElement("div",{style:{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:14,padding:"14px 16px",flex:1,minWidth:0}},React.createElement("div",{style:{fontSize:10,color:"var(--text-muted)",fontWeight:700,textTransform:"uppercase",letterSpacing:".05em",marginBottom:6}},e),React.createElement("div",{style:{fontSize:20,fontWeight:800,color:a||"var(--text-primary)",fontVariantNumeric:"tabular-nums"}},t),n&&React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginTop:3}},n))}function SimpleTicketCard({ticket:e,onOpen:t}){const a=new Date(e.created_at),n=a.toLocaleTimeString("cs-CZ",{hour:"2-digit",minute:"2-digit"}),o=a.toLocaleDateString("cs-CZ",{day:"numeric",month:"long"}).replace(" ",". "),r=e.selections?.[0],l=(e.selections?.length||0)-1;let i="?",c="var(--text-muted)";"won"===e.status?(i="✓",c="var(--accent-safe)"):"lost"===e.status?(i="✗",c="var(--accent-danger)"):"live"===e.status&&(i="●",c="#FF6B9D");const s="won"===e.status||"lost"===e.status,d=s?e.actual_profit_loss:(e.stake||0)*(e.total_odds||1),m=s?"won"===e.status?"Skutečná výhra":"Ztráta":"Možná výhra";return React.createElement("div",{style:{background:"var(--bg-card)",border:"1px solid var(--border-color)",borderLeft:`3px solid ${c}`,borderRadius:8,padding:12,cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,0.15)",transition:"all 0.2s ease"},className:"card",onClick:()=>t&&t(e)},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)"}},o.replace(/\\d+\\./g,e=>"01."===e?"Zítra":e)," | ",n," | ",e.sport?.toUpperCase()||""),React.createElement("div",{style:{fontSize:18,color:c,fontWeight:700}},i)),React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:4}},r?.home_team," - ",r?.away_team),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",marginBottom:10}},"a ",l," dalších příležitostí"),React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:12,paddingTop:10,borderTop:"1px solid var(--border-color)"}},React.createElement("div",null,React.createElement("div",{style:{color:"var(--text-muted)",fontSize:11,marginBottom:2}},"Vklad"),React.createElement("div",{style:{fontWeight:700,fontSize:14}},Math.round(e.actual_stake_amount||e.stake||0)," Kč")),React.createElement("div",{style:{textAlign:"center"}},React.createElement("div",{style:{color:"var(--text-muted)",fontSize:11,marginBottom:2}},m),React.createElement("div",{style:{fontWeight:700,fontSize:14,color:d>=0?"var(--accent-safe)":"var(--accent-danger)"}},d>=0?"+":"",Math.round(d)," Kč")),React.createElement("div",{style:{textAlign:"right"}},React.createElement("div",{style:{color:"var(--text-muted)",fontSize:11,marginBottom:2}},"Kurz"),React.createElement("div",{style:{fontWeight:700,fontSize:14}},(e.total_odds||0).toFixed(2)))))}function HistoryView(){const[e,t]=React.useState([]),[a,n]=React.useState(null),[o,r]=React.useState(!1),[l,i]=React.useState("all"),[c,s]=React.useState("all"),[d,m]=React.useState(null),[p,u]=React.useState(!1),[v,g]=React.useState(""),[y,f]=React.useState(!1),h=React.useCallback(()=>{r(!0),f(!1),authFetch(`${API_BASE_URL}/tickets/sync`).then(e=>e.json()).then(e=>{if(!(e&&e.tickets&&Array.isArray(e.tickets)))throw new Error("Invalid sync response");t(e.tickets)}).catch(()=>authFetch(`${API_BASE_URL}/tickets/saved`).then(e=>e.json()).then(e=>{if(!Array.isArray(e))throw new Error("Invalid saved response");t(e)})).catch(()=>f(!0)).finally(()=>{authFetch(`${API_BASE_URL}/tickets/real-results`).then(e=>e.json()).then(e=>n(e)).catch(()=>{}).finally(()=>r(!1)),authFetch(`${API_BASE_URL}/tickets/settle`,{method:"POST"}).catch(()=>{})})},[]);React.useEffect(()=>{h()},[h]);const k=(e,t)=>e.filter(e=>e.status===t).length,b=e.filter(e=>"won"===e.status||"lost"===e.status).sort((e,t)=>new Date(t.created_at)-new Date(e.created_at)),R="all"===c?b:e.filter(e=>e.status===c).sort((e,t)=>new Date(t.created_at)-new Date(e.created_at)),E=e.filter(e=>(e=>{const t=new Date(e),a=new Date;return t.getFullYear()===a.getFullYear()&&t.getMonth()===a.getMonth()&&t.getDate()===a.getDate()})(e.created_at)),x={count:E.length,won:E.filter(e=>"won"===e.status).length,lost:E.filter(e=>"lost"===e.status).length,pending:E.filter(e=>"pending"===e.status||"live"===e.status).length,profit:E.reduce((e,t)=>e+(t.actual_profit_loss||0),0)},S=((e,t)=>{const a=((e,t)=>{if("all"===t)return e;const a=new Date,n="7days"===t?7:"30days"===t?30:0,o=new Date(a.getTime()-24*n*60*60*1e3);return e.filter(e=>new Date(e.created_at)>=o)})(e,t);if(0===a.length)return{profitLoss:0,successRate:0,totalStaked:0,avgOdds:0,roi:0,ticketCount:0};const n=a.reduce((e,t)=>e+(t.actual_profit_loss||0),0),o=a.reduce((e,t)=>e+(t.actual_stake_amount||t.stake||0),0),r=a.filter(e=>"won"===e.status).length,l=a.filter(e=>"pending"!==e.status).length;return{profitLoss:n,successRate:l>0?Math.round(r/l*100*10)/10:0,totalStaked:o,avgOdds:a.length>0?Math.round(a.reduce((e,t)=>e+(t.total_odds||0),0)/a.length*100)/100:0,roi:o>0?Math.round(n/o*100*10)/10:0,ticketCount:a.length}})(e,l),z={all:b.length,pending:k(e,"pending"),live:k(e,"live"),won:k(e,"won"),lost:k(e,"lost")};React.useEffect(()=>{console.log(`[DEBUG] HistoryView: allTickets.length=${e.length}`),console.log(`[DEBUG] HistoryView: filteredByStatus.length=${R.length} (activeTab=${c})`),console.log("[DEBUG] HistoryView: tabCounts=",z)},[e,c,R,z]),React.useEffect(()=>{d&&d.total_odds&&g(d.total_odds.toFixed(2))},[d]);const w=()=>{!d||!v||parseFloat(v)<=0?alert("Kurz musí být kladné číslo"):authFetch(`${API_BASE_URL}/tickets/${d.ticket_id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({total_odds:parseFloat(v)})}).then(e=>e.json()).then(()=>{m(e=>({...e,total_odds:parseFloat(v)})),u(!1)}).catch(e=>alert("Chyba: "+e.message))};if(d){const e=d,t="won"===e.status?"var(--accent-safe)":"lost"===e.status?"var(--accent-danger)":"var(--text-muted)",a="won"===e.status?"✓ Vyhráno":"lost"===e.status?"✗ Prohráno":"· Čeká na výsledek";return React.createElement("div",{className:"panel"},React.createElement("button",{onClick:()=>m(null),style:{display:"flex",alignItems:"center",gap:8,background:"none",border:"none",color:"var(--text-muted)",cursor:"pointer",fontSize:14,padding:"0 0 16px",marginBottom:4}},"← Zpět na historii"),React.createElement("div",{className:"card",style:{marginBottom:12}},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}},React.createElement("div",null,React.createElement("div",{style:{fontSize:13,color:"var(--text-muted)",marginBottom:4}},new Date(e.created_at).toLocaleString("cs-CZ")),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:4}},p?React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center"}},React.createElement("input",{type:"number",step:"0.01",value:v,onChange:e=>g(e.target.value),style:{width:80,padding:"4px 6px",border:"1px solid var(--accent-safe)",borderRadius:4,fontSize:14,fontWeight:700}}),React.createElement("button",{onClick:w,style:{padding:"4px 8px",background:"var(--accent-safe)",color:"white",border:"none",borderRadius:4,cursor:"pointer",fontSize:12,fontWeight:600}},"✓ Uložit"),React.createElement("button",{onClick:()=>{u(!1),g(e.total_odds?.toFixed(2)||"")},style:{padding:"4px 8px",background:"var(--accent-danger)",color:"white",border:"none",borderRadius:4,cursor:"pointer",fontSize:12,fontWeight:600}},"✕ Zrušit")):React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center"}},React.createElement("div",{style:{fontSize:22,fontWeight:800}},e.total_odds?.toFixed(2)),React.createElement("button",{onClick:()=>u(!0),style:{padding:"2px 6px",background:"var(--surface-raised)",border:"1px solid var(--border)",borderRadius:4,cursor:"pointer",fontSize:11,color:"var(--text-muted)"}},"✏️ Editovat"))),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)"}},"celkový kurz · ",(e.selections||[]).length," tipů")),React.createElement("div",{style:{textAlign:"right"}},React.createElement("div",{style:{fontSize:15,fontWeight:700,color:t}},a),e.actual_stake_amount&&React.createElement("div",{style:{marginTop:6}},React.createElement("div",{style:{fontSize:13,color:"var(--text-muted)"}},"Vsazeno: ",e.actual_stake_amount," Kč"),null!=e.actual_profit_loss&&React.createElement("div",{style:{fontSize:15,fontWeight:700,color:e.actual_profit_loss>=0?"var(--accent-safe)":"var(--accent-danger)"}},e.actual_profit_loss>=0?"+":"",e.actual_profit_loss," Kč"))))),React.createElement("div",{className:"card",style:{padding:0,overflow:"hidden"}},(e.selections||[]).map((e,t)=>React.createElement("div",{key:t,style:{padding:"11px 16px",borderBottom:"1px solid var(--border)",display:"flex",gap:8,alignItems:"center"}},React.createElement("div",{style:{color:"won"===e.result?"var(--accent-safe)":"lost"===e.result?"var(--accent-danger)":"var(--text-muted)"}},"won"===e.result?"✓":"lost"===e.result?"✗":"·"),React.createElement("div",{style:{flex:1}},React.createElement("div",{style:{fontSize:13,fontWeight:600}},e.home_team," – ",e.away_team),React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginTop:2}},e.market_type," ",e.selection,e.kickoff_date&&React.createElement("span",null," · ",e.kickoff_date,e.kickoff_time&&` ${e.kickoff_time}`))),React.createElement("div",{style:{textAlign:"right",fontSize:12,fontWeight:600}},e.odds?.toFixed(2))))))}return React.createElement("div",{className:"panel"},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}},React.createElement("div",{className:"panel-title"},React.createElement(IconHistory,null)," Historie a statistika")),React.createElement("div",{style:{display:"flex",gap:6,marginBottom:16}},React.createElement("button",{className:"btn btn-small"+("all"===l?" btn-primary":" btn-ghost"),onClick:()=>i("all"),style:{flex:1,fontSize:12}},"Vše"),React.createElement("button",{className:"btn btn-small"+("7days"===l?" btn-primary":" btn-ghost"),onClick:()=>i("7days"),style:{flex:1,fontSize:12}},"7 dní"),React.createElement("button",{className:"btn btn-small"+("30days"===l?" btn-primary":" btn-ghost"),onClick:()=>i("30days"),style:{flex:1,fontSize:12}},"30 dní")),React.createElement("div",{className:"card",style:{marginBottom:16,padding:14}},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},React.createElement("div",{style:{fontWeight:700,fontSize:14}},"📅 Dnes"),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)"}},(new Date).toLocaleDateString("cs-CZ"))),o&&0===e.length?React.createElement("div",{style:{fontSize:13,color:"var(--text-muted)",display:"flex",alignItems:"center",gap:8}},React.createElement("span",{style:{display:"inline-block",animation:"spin .8s linear infinite"}},"⟳"),"Načítám…"):0===x.count?React.createElement("div",{style:{fontSize:13,color:"var(--text-muted)"}},"Dnes zatím žádné tikety."):React.createElement("div",{style:{display:"flex",gap:14,flexWrap:"wrap",fontSize:13}},React.createElement("div",null,React.createElement("strong",null,x.count)," ",React.createElement("span",{style:{color:"var(--text-muted)"}},"tiketů")),React.createElement("div",{style:{color:"var(--accent-safe)"}},React.createElement("strong",null,x.won)," vyhráno"),React.createElement("div",{style:{color:"var(--accent-danger)"}},React.createElement("strong",null,x.lost)," prohráno"),x.pending>0&&React.createElement("div",{style:{color:"var(--text-muted)"}},React.createElement("strong",null,x.pending)," čeká (dnes)"),(x.won>0||x.lost>0)&&React.createElement("div",{style:{color:x.profit>=0?"var(--accent-safe)":"var(--accent-danger)",marginLeft:"auto"}},React.createElement("strong",null,x.profit>=0?"+":"",Math.round(x.profit)," Kč")))),React.createElement("div",{className:"fade-in"},React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:12}},React.createElement("div",{className:"card",style:{textAlign:"center",padding:12}},React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginBottom:4,display:"flex",alignItems:"center",justifyContent:"center",gap:4}},"Zisk/Ztráta",React.createElement(InfoTooltip,{text:"Součet skutečného zisku/ztráty (Kč) z tvých tiketů, co jsi označil jako vsazené A appka je už vyhodnotila (výhra/prohra). Nevyhodnocené (pending) tikety se nepočítají. Počítá se z tvých uložených tiketů a přepočítá se pokaždé, když otevřeš Historii."})),React.createElement("div",{className:"mono",style:{fontSize:20,fontWeight:700,color:S.profitLoss>=0?"var(--accent-safe)":"var(--accent-danger)"}},S.profitLoss>=0?"+":"",Math.round(S.profitLoss)," Kč")),React.createElement("div",{className:"card",style:{textAlign:"center",padding:12}},React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginBottom:4,display:"flex",alignItems:"center",justifyContent:"center",gap:4}},"Úspěšnost",React.createElement(InfoTooltip,{text:"Podíl vyhraných tiketů z těch, co už appka vyhodnotila (výhra ÷ (výhra+prohra) × 100). Nevyhodnocené a živé tikety se do výpočtu vůbec nepočítají — ani do čitatele, ani do jmenovatele."})),React.createElement("div",{className:"mono",style:{fontSize:20,fontWeight:700,color:"var(--accent-safe)"}},S.successRate,"%")),React.createElement("div",{className:"card",style:{textAlign:"center",padding:12}},React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginBottom:4,display:"flex",alignItems:"center",justifyContent:"center",gap:4}},"ROI",React.createElement(InfoTooltip,{text:"Zisk/Ztráta ÷ Vsazeno × 100. Kladné číslo = appka by tě v souhrnu posunula do zisku. Počítá se jen z vyhodnocených tiketů, co mají zadanou skutečnou vsazenou částku — čím míň jich je, tím víc může tohle číslo kolísat s každým dalším výsledkem."})),React.createElement("div",{className:"mono",style:{fontSize:20,fontWeight:700,color:S.roi>=0?"var(--accent-safe)":"var(--accent-danger)"}},S.roi>=0?"+":"",S.roi,"%")),React.createElement("div",{className:"card",style:{textAlign:"center",padding:12}},React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginBottom:4,display:"flex",alignItems:"center",justifyContent:"center",gap:4}},"Vsazeno",React.createElement(InfoTooltip,{text:"Součet skutečných částek (Kč), co jsi u jednotlivých tiketů sám zadal jako 'kolik jsem reálně vsadil' — ne doporučená appkou výše vkladu, ale to, co jsi vyplnil ty při ukládání tiketu."})),React.createElement("div",{className:"mono",style:{fontSize:16,fontWeight:700}},Math.round(S.totalStaked)," Kč")),React.createElement("div",{className:"card",style:{textAlign:"center",padding:12}},React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginBottom:4,display:"flex",alignItems:"center",justifyContent:"center",gap:4}},"Prům. kurz",React.createElement(InfoTooltip,{text:"Průměrný celkový kurz napříč VŠEMI zobrazenými tikety ve zvoleném období — i těmi, co ještě čekají na výsledek nebo je nemáš vsazené. Není to tedy jen průměr z vyhraných."})),React.createElement("div",{className:"mono",style:{fontSize:16,fontWeight:700}},S.avgOdds)),React.createElement("div",{className:"card",style:{textAlign:"center",padding:12}},React.createElement("div",{style:{fontSize:11,color:"var(--text-muted)",marginBottom:4,display:"flex",alignItems:"center",justifyContent:"center",gap:4}},"Tiketů",React.createElement(InfoTooltip,{text:"Celkový počet uložených tiketů ve zvoleném období (Vše / 7 dní / 30 dní podle data vytvoření), bez ohledu na to, jestli byly vsazené nebo vyhodnocené."})),React.createElement("div",{className:"mono",style:{fontSize:20,fontWeight:700,color:"var(--text-primary)"}},S.ticketCount)),a?.by_type&&Object.keys(a.by_type).length>0&&React.createElement("div",{className:"card",style:{padding:12,marginBottom:12,fontSize:12,background:"var(--bg-accent)"}},React.createElement("div",{style:{marginBottom:8,fontWeight:600,color:"var(--text-accent)"}},"Výsledky podle délky"),React.createElement("div",{style:{display:"flex",gap:8,flexWrap:"wrap",color:"var(--text-accent)",fontSize:11}},a.by_type.kratky&&React.createElement("div",null,React.createElement("strong",null,"Krátký:")," ",a.by_type.kratky.win_rate,"%"),a.by_type.stredni&&React.createElement("div",null,React.createElement("strong",null,"Střední:")," ",a.by_type.stredni.win_rate,"%"),a.by_type.dlouhy&&React.createElement("div",null,React.createElement("strong",null,"Dlouhý:")," ",a.by_type.dlouhy.win_rate,"%"))),a?.history&&React.createElement(MiniLineChart,{history:a.history})),React.createElement("div",{style:{display:"flex",borderBottom:"0.5px solid var(--border)",marginBottom:12,marginTop:16,overflowX:"auto"}},React.createElement("button",{style:{flex:1,padding:12,border:"none",background:"none",cursor:"pointer",whiteSpace:"nowrap",color:"all"===c?"var(--text-primary)":"var(--text-secondary)",fontWeight:"all"===c?500:400,borderBottom:"all"===c?"2px solid var(--text-accent)":"2px solid transparent"},onClick:()=>s("all")},"Vše ",React.createElement("span",{style:{color:"var(--text-muted)"}},"(",z.all,")")),React.createElement("button",{style:{flex:1,padding:12,border:"none",background:"none",cursor:"pointer",color:"pending"===c?"var(--text-primary)":"var(--text-secondary)",fontWeight:"pending"===c?500:400,borderBottom:"pending"===c?"2px solid var(--text-accent)":"2px solid transparent"},onClick:()=>s("pending")},"Nevyhodnocené ",React.createElement("span",{style:{color:"var(--text-muted)"}},"(",z.pending,")")),React.createElement("button",{style:{flex:1,padding:12,border:"none",background:"none",cursor:"pointer",color:"live"===c?"var(--text-primary)":"var(--text-secondary)",fontWeight:"live"===c?500:400,borderBottom:"live"===c?"2px solid var(--text-accent)":"2px solid transparent"},onClick:()=>s("live")},"Live ",React.createElement("span",{style:{color:"var(--text-muted)"}},"(",z.live,")")),React.createElement("button",{style:{flex:1,padding:12,border:"none",background:"none",cursor:"pointer",color:"won"===c?"var(--text-primary)":"var(--text-secondary)",fontWeight:"won"===c?500:400,borderBottom:"won"===c?"2px solid var(--text-accent)":"2px solid transparent"},onClick:()=>s("won")},"Vyhrané ",React.createElement("span",{style:{color:"var(--text-muted)"}},"(",z.won,")")),React.createElement("button",{style:{flex:1,padding:12,border:"none",background:"none",cursor:"pointer",color:"lost"===c?"var(--text-primary)":"var(--text-secondary)",fontWeight:"lost"===c?500:400,borderBottom:"lost"===c?"2px solid var(--text-accent)":"2px solid transparent"},onClick:()=>s("lost")},"Prohrané ",React.createElement("span",{style:{color:"var(--text-muted)"}},"(",z.lost,")"))),o&&0===e.length&&React.createElement("div",{className:"empty-state"},"Načítám historii…"),!o&&y&&0===e.length&&React.createElement("div",{className:"empty-state"},"Načtení historie se nepovedlo — možná se server zrovna probouzí.",React.createElement("br",null),React.createElement("br",null),React.createElement("button",{className:"btn btn-small btn-ghost",onClick:h},"Zkusit znovu")),!o&&!y&&0===e.length&&React.createElement("div",{className:"empty-state"},"Žádné uložené tikety."),R.length>0?React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:12,paddingBottom:16}},R.map(e=>React.createElement(SimpleTicketCard,{key:e.id,ticket:e,onOpen:m}))):!o&&React.createElement("div",{className:"empty-state"},"Žádné tikety v této kategorii")))}function AppTour({onDone:e}){const[t,a]=React.useState(0),[n,o]=React.useState(null),r=React.useRef(null),l=[{selector:null,icon:"🎯",title:"Vítej v ApexSignal!",desc:"Za 30 sekund tě provedeme appkou. Ukážeme ti kde na co kliknout.",next:"Začít →"},{selector:".panel-title, .panel-section",icon:"🛡️",title:"Délka tiketu",desc:"Tady vyber délku tiketu. Krátký = 2–3 výběry s nižším kurzem. BOOST = TOP 5 zápasů, kurz 10–15, MOONSHOT!",next:"Rozumím →"},{selector:".timeframe-row",icon:"📅",title:"Časový rámec",desc:"Tlačítky vyber na kolik dní dopředu chceš zápasy. Doporučujeme 2–3 dny.",next:"OK →"},{selector:".btn-primary",icon:"⚽",title:"Vygenerovat tiket",desc:"Klikni sem! Model stáhne zápasy a vybere ty s nejvyšší pravděpodobností výhry. Trvá to 10–60 sekund.",next:"Jasné →"},{selector:".selection-row",icon:"🔄",title:"Výběry v tiketu",desc:"Každý výběr má dvě tlačítka: 🔄 vymění zápas za jiný, ✕ ho odebere bez náhrady. Kurz ✏️ přepíšeš svůj.",next:"Super →"},{selector:".btn-save",icon:"💾",title:"Uložit tiket",desc:"Vyplň částku co chceš vsadit a klikni Uložit tiket. Appka ti pak sleduje výsledky a statistiky.",next:"Výborně →"},{selector:".nav-btn:last-child",icon:"📊",title:"Historie a statistiky",desc:"V záložce Historie vidíš všechny uložené tikety, jejich výsledky, ROI a win rate. Výsledky se označují automaticky.",next:"Hotovo! 🚀"}],i=l[t],c=t===l.length-1;React.useEffect(()=>{if(!i.selector)return void o(null);const e=document.querySelector(i.selector);e?(e.scrollIntoView({behavior:"smooth",block:"center"}),setTimeout(()=>{const t=e.getBoundingClientRect();o({top:t.top-8,left:t.left-8,width:t.width+16,height:t.height+16})},400)):o(null)},[t]);const s=React.useMemo(()=>{const e={left:"50%",transform:"translateX(-50%)"};if(!n)return{...e,bottom:100};return window.innerHeight-n.top-n.height>240?{...e,top:n.top+n.height+16}:{...e,bottom:window.innerHeight-n.top+16}},[n]);return React.createElement(React.Fragment,null,n&&React.createElement("div",{className:"tour-spotlight",style:{top:n.top,left:n.left,width:n.width,height:n.height}}),React.createElement("div",{className:"tour-card",ref:r,style:s,key:t},React.createElement("div",{style:{display:"flex",gap:5,marginBottom:14}},l.map((e,a)=>React.createElement("span",{key:a,className:"tour-dot"+(a===t?" active":"")}))),React.createElement("div",{style:{fontSize:26,marginBottom:8}},i.icon),React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#E7EBF2",marginBottom:6}},i.title),React.createElement("div",{style:{fontSize:13,color:"#8A93A8",lineHeight:1.55}},i.desc),React.createElement("button",{className:"tour-next",onClick:()=>c?e():a(e=>e+1)},i.next),React.createElement("button",{className:"tour-skip",onClick:e},"Přeskočit průvodce")))}function PostRegOnboarding({onDone:e}){return React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:20}},React.createElement("div",{style:{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:20,padding:28,maxWidth:420,width:"100%",maxHeight:"90vh",overflowY:"auto"}},React.createElement("div",{style:{textAlign:"center",marginBottom:24}},React.createElement("div",{style:{fontSize:28,marginBottom:8}},"🎯"),React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"var(--text-primary)",marginBottom:6}},"Vítej v ApexSignal!"),React.createElement("div",{style:{fontSize:13,color:"var(--text-muted)",lineHeight:1.5}},"Tady je rychlý průvodce jak začít.")),React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:12,marginBottom:20}},[{icon:"🧠",title:"Appka ti hledá tipy",desc:"ApexSignal se dívá na spoustu dat kolem zápasů a hledá tipy, kde věří víc než sázková kancelář."},{icon:"🛡️",title:"Vyber typ tiketu",desc:"Krátký = klidnější, menší výhra. Střední uprostřed. BOOST = riskantní, ale s velkým potenciálem."},{icon:"⚽",title:"Klikni Vygenerovat",desc:"Appka ti během chvilky sama poskládá tiket ze zápasů, kterým věří."},{icon:"💾",title:"Ulož a sleduj",desc:"Zadej vsazenou částku, ulož tiket a appka ti pak sama hlídá výsledky a statistiky v Historii."}].map((e,t)=>React.createElement("div",{key:t,style:{display:"flex",gap:12,alignItems:"flex-start"}},React.createElement("div",{style:{width:36,height:36,borderRadius:10,background:"var(--surface-raised)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}},e.icon),React.createElement("div",null,React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"var(--text-primary)",marginBottom:2}},e.title),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",lineHeight:1.4}},e.desc))))),React.createElement("div",{style:{background:"var(--surface-raised)",border:"1px solid var(--border)",borderRadius:14,padding:14,marginBottom:20}},React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"var(--text-primary)",marginBottom:6}},"🎟️ Jak fungují tokeny"),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",lineHeight:1.5}},"Každé vygenerování tiketu appku stojí pár tokenů — Krátký nejmíň, BOOST nejvíc (má totiž největší potenciální výhru). 1 token = 20 Kč, tokeny si kdykoliv dokoupíš přímo v appce (🎟️ nahoře).")),React.createElement("button",{onClick:e,className:"btn btn-primary",style:{width:"100%",justifyContent:"center",fontSize:15}},"Pojďme na to →"),React.createElement("div",{style:{textAlign:"center",marginTop:10,fontSize:11,color:"var(--text-muted)"}},"18+ · Appka je nástroj pro rozhodování, ne záruka výhry")))}function OnboardingScreen({onContinue:e}){return React.createElement("div",{style:{minHeight:"100vh",background:"var(--surface)",overflowY:"auto"}},React.createElement("div",{style:{maxWidth:480,margin:"0 auto",padding:"0 0 40px"}},React.createElement("div",{style:{textAlign:"center",padding:"48px 24px 32px"}},React.createElement("div",{style:{display:"inline-flex",alignItems:"center",gap:10,marginBottom:20}},React.createElement("span",{className:"brand-dot"}),React.createElement("span",{style:{fontSize:20,fontWeight:700}},"ApexSignal")),React.createElement("div",{style:{fontSize:24,fontWeight:700,color:"var(--text-primary)",marginBottom:10,lineHeight:1.3}},"Data místo dohadu"),React.createElement("div",{style:{fontSize:14,color:"var(--text-muted)",lineHeight:1.6,marginBottom:6}},"ApexSignal každý den projde fotbalové zápasy, sám je vyhodnotí a sestaví tiket — jen z výběrů, kterým věří."),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",opacity:.7}},"Funguje na datech. Ne na tušení.")),React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,padding:"0 16px 24px"}},[{icon:"⚽",title:"Reálná data",desc:"Forma týmů, zranění, domácí prostředí — data z API, ne z novin."},{icon:"🧠",title:"Vlastní analýza",desc:"Appka porovná svůj odhad s kurzy sázkových kanceláří a hledá výhodu."},{icon:"📝",title:"Zdůvodnění",desc:"U každého tiketu appka napíše, proč vybrala právě tyhle zápasy."},{icon:"📈",title:"Statistiky",desc:"Sleduj ROI a vývoj svých výsledků v čase."}].map((e,t)=>React.createElement("div",{key:t,style:{background:"var(--surface-raised)",border:"1px solid var(--border)",borderRadius:14,padding:"16px 14px"}},React.createElement("div",{style:{fontSize:22,marginBottom:8}},e.icon),React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"var(--text-primary)",marginBottom:5}},e.title),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",lineHeight:1.5}},e.desc)))),React.createElement("div",{style:{padding:"0 16px 24px"}},React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:12}},"Jak to funguje"),React.createElement("div",{style:{background:"var(--surface-raised)",border:"1px solid var(--border)",borderRadius:14,padding:"16px 14px"}},[{step:"1",label:"Stažení zápasů",desc:"Dnešní a nadcházející zápasy z několika soutěží"},{step:"2",label:"Vyhodnocení",desc:"Appka si na základě formy a dalších dat udělá vlastní odhad"},{step:"3",label:"Filtrování",desc:"Appka pustí dál jen výběry, kde věří víc než trh — podle typu tiketu jinak přísně"},{step:"4",label:"Sestavení tiketu",desc:"Appka ti k tomu doporučí i přiměřenou výši vkladu"},{step:"5",label:"Statistiky",desc:"ROI a vývoj tvých výsledků v čase"}].map((e,t,a)=>React.createElement("div",{key:t,style:{display:"flex",gap:12,alignItems:"flex-start",marginBottom:t<a.length-1?14:0}},React.createElement("div",{style:{width:24,height:24,borderRadius:"50%",background:"rgba(25,224,196,0.15)",border:"1px solid rgba(25,224,196,0.4)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:"#19E0C4",flexShrink:0}},e.step),React.createElement("div",null,React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"var(--text-primary)"}},e.label),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",marginTop:2}},e.desc)))))),React.createElement("div",{style:{margin:"0 16px 24px",background:"var(--surface-raised)",border:"1px solid var(--border)",borderRadius:12,padding:"12px 14px",fontSize:12,color:"var(--text-muted)",lineHeight:1.5}},"ℹ️ ApexSignal je analytický nástroj — ne záruka výhry. Model pracuje s pravděpodobnostmi. Výsledky nelze zaručit. Sázej zodpovědně. 18+."),React.createElement("div",{style:{padding:"0 16px",textAlign:"center"}},React.createElement("button",{className:"btn btn-primary",style:{width:"100%",justifyContent:"center",fontSize:15},onClick:e},"Začít používat →"),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",marginTop:10}},"Zdarma · Bez nutnosti karty"))))}function AuthScreen({onAuthenticated:e}){const[t,a]=React.useState("login"),[n,o]=React.useState(""),[r,l]=React.useState(""),[i,c]=React.useState(""),[s,d]=React.useState(!1),[m,p]=React.useState(!1),[u,v]=React.useState(""),g=React.useRef(null),y=React.useCallback(t=>{c(""),d(!0),fetch(`${API_BASE_URL}/auth/google`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({credential:t.credential}),signal:AbortSignal.timeout(9e4)}).then(async e=>{const t=await e.json();if(!e.ok)throw new Error(t.detail||"Přihlášení přes Google se nepovedlo.");return t}).then(t=>e(t)).catch(e=>c(friendlyFetchError(e)||"Přihlášení přes Google se nepovedlo.")).finally(()=>d(!1))},[e]);React.useEffect(()=>{if(!g.current)return;const e=()=>{window.google&&g.current&&(window.google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:y}),window.google.accounts.id.renderButton(g.current,{theme:"filled_black",size:"large",shape:"pill",width:320,text:"continue_with"}))};if(window.google&&window.google.accounts)e();else{const t=document.getElementById("google-identity-script"),a=t||document.createElement("script");a.id="google-identity-script",a.src="https://accounts.google.com/gsi/client",a.async=!0,a.onload=e,t||document.head.appendChild(a)}},[y]);const f=()=>{n&&!s&&(d(!0),c(""),v(""),fetch(`${API_BASE_URL}/auth/forgot-password`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:n}),signal:AbortSignal.timeout(9e4)}).then(async e=>{const t=await e.json();if(!e.ok)throw new Error(t.detail||"Něco se nepovedlo, zkus to znovu.");v(t.status)}).catch(e=>c(friendlyFetchError(e)||"Něco se nepovedlo, zkus to znovu.")).finally(()=>d(!1)))},h=()=>{if(!n||!r||s)return;d(!0),c(""),p(!1);const a=setTimeout(()=>p(!0),4e3);fetch(`${API_BASE_URL}${"login"===t?"/auth/login":"/auth/register"}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:n,password:r}),signal:AbortSignal.timeout(9e4)}).then(async e=>{const t=await e.json();if(!e.ok)throw new Error(t.detail||"Něco se nepovedlo, zkus to znovu.");return t}).then(t=>e(t)).catch(e=>{"TimeoutError"===e.name||"AbortError"===e.name?c("Server se neprobudil včas. Zkus to znovu — při druhém pokusu to bude rychlejší."):c(friendlyFetchError(e))}).finally(()=>{clearTimeout(a),d(!1),p(!1)})};return"forgot"===t?React.createElement("div",{className:"auth-screen"},React.createElement("div",{className:"auth-card"},React.createElement("div",{className:"brand display",style:{justifyContent:"center",marginBottom:22}},React.createElement("span",{className:"brand-dot"}),"ApexSignal"),React.createElement("div",{style:{fontSize:14,color:"var(--text-muted)",marginBottom:14,textAlign:"center"}},"Zadej e-mail, pošleme ti na něj odkaz na obnovení hesla."),React.createElement("input",{type:"email",placeholder:"E-mail",value:n,autoComplete:"username",onChange:e=>o(e.target.value),onKeyDown:e=>"Enter"===e.key&&f(),className:"auth-input"}),i&&React.createElement("div",{className:"auth-error"},i),u&&React.createElement("div",{className:"auth-fine",style:{color:"var(--accent-safe)",marginBottom:8}},u),React.createElement("button",{className:"btn btn-primary",style:{width:"100%",justifyContent:"center",marginTop:4},disabled:s,onClick:f},s?"Odesílám…":"Poslat odkaz"),React.createElement("div",{className:"auth-fine",style:{marginTop:10}},React.createElement("a",{href:"#",onClick:e=>{e.preventDefault(),a("login"),c(""),v("")},style:{color:"var(--accent-safe)"}},"← Zpět na přihlášení")))):React.createElement("div",{className:"auth-screen"},React.createElement("div",{className:"auth-card"},React.createElement("div",{className:"brand display",style:{justifyContent:"center",marginBottom:22}},React.createElement("span",{className:"brand-dot"}),"ApexSignal"),React.createElement("div",{className:"auth-toggle"},React.createElement("button",{className:"login"===t?"active":"",onClick:()=>{a("login"),c("")}},"Přihlásit se"),React.createElement("button",{className:"register"===t?"active":"",onClick:()=>{a("register"),c("")}},"Vytvořit účet")),GOOGLE_CLIENT_ID&&React.createElement(React.Fragment,null,React.createElement("div",{style:{display:"flex",justifyContent:"center",marginBottom:14},ref:g}),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,margin:"2px 0 14px",color:"var(--text-muted)",fontSize:12}},React.createElement("div",{style:{flex:1,height:1,background:"var(--border)"}}),"nebo",React.createElement("div",{style:{flex:1,height:1,background:"var(--border)"}}))),React.createElement("input",{type:"email",placeholder:"E-mail",value:n,autoComplete:"username",onChange:e=>o(e.target.value),onKeyDown:e=>"Enter"===e.key&&h(),className:"auth-input"}),React.createElement("input",{type:"password",placeholder:"Heslo (aspoň 8 znaků)",value:r,autoComplete:"login"===t?"current-password":"new-password",onChange:e=>l(e.target.value),onKeyDown:e=>"Enter"===e.key&&h(),className:"auth-input"}),"login"===t&&React.createElement("div",{style:{textAlign:"right",marginTop:-8,marginBottom:12}},React.createElement("a",{href:"#",onClick:e=>{e.preventDefault(),a("forgot"),c("")},style:{fontSize:12,color:"var(--text-muted)"}},"Zapomenuté heslo?")),i&&React.createElement("div",{className:"auth-error"},i),m&&!i&&React.createElement("div",{className:"auth-fine",style:{color:"var(--accent-aggr)",marginBottom:8}},"⏳ Server se probouzí, může to trvat až minutu…"),React.createElement("button",{className:"btn btn-primary",style:{width:"100%",justifyContent:"center",marginTop:4},disabled:s,onClick:h},s?m?"Probouzím server…":"Přihlašuji…":"login"===t?"Přihlásit se":"Vytvořit účet"),React.createElement("div",{className:"auth-fine"},"18+ · appka je nástroj pro rozhodování, ne záruka výhry"),React.createElement("div",{className:"auth-fine",style:{marginTop:6}},"Vytvořením účtu souhlasíš s ",React.createElement("a",{href:"/terms.html",target:"_blank",rel:"noopener",style:{color:"var(--accent-safe)"}},"obchodními podmínkami")," a ",React.createElement("a",{href:"/privacy.html",target:"_blank",rel:"noopener",style:{color:"var(--accent-safe)"}},"zásadami ochrany osobních údajů"),".")))}function ApexSignalApp(){const[e,t]=useState(()=>API_BASE_URL?getStoredAuth():{email:"mock"}),[a,n]=useState(()=>!getStoredAuth()),[o,r]=useState(!1),[l,i]=useState(!1);useEffect(()=>{const e=()=>t(null);return window.addEventListener("apexsignal:unauthorized",e),()=>window.removeEventListener("apexsignal:unauthorized",e)},[]);const c=()=>{setStoredAuth(null),t(null)},[s,d]=useState(!1),[m,p]=useState(""),[u,v]=useState(""),[g,y]=useState(!1),[f,h]=useState("tickets"),[k,b]=useState(50),[R,E]=useState(["football"]),[x,S]=useState(["match_winner","over_goals"]),[z,w]=useState(3),[_,T]=useState(null),[C,A]=useState(null),[N,B]=useState({safe:null,aggressive:null}),[j,O]=useState(null),[I,F]=useState(""),[P,W]=useState(!1),[L,D]=useState({}),[M,H]=useState({}),K=useRef([]),V=useRef(new Set),[$,U]=useState(null),[Z,G]=useState(!1),[J,Y]=useState(""),[q,X]=useState(""),[Q,ee]=useState(!1),te=useCallback(()=>{e&&authFetch(`${API_BASE_URL}/tokens/balance`).then(e=>e.json()).then(e=>U(e.balance)).catch(()=>{})},[e]);useEffect(()=>{te()},[te]),useEffect(()=>{const e=new URLSearchParams(window.location.search).get("payment");e&&(window.history.replaceState({},"",window.location.pathname),"success"===e&&setTimeout(te,2500))},[te]);const[ae,ne]=useState(null);useEffect(()=>{fetch(`${API_BASE_URL}/tokens/prices`).then(e=>e.json()).then(ne).catch(()=>{})},[]);const[oe,re]=useState(!1),[le,ie]=useState(""),[ce,se]=useState(""),[de,me]=useState(null);useEffect(()=>{const e=e=>{e&&!e.persisted||me(null)};return window.addEventListener("pageshow",e),()=>window.removeEventListener("pageshow",e)},[]);const pe=e=>{!e||e<1||de||(me(e),se(""),authFetch(`${API_BASE_URL}/payments/create-checkout-session`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokens:e})}).then(async e=>{const t=await e.json();if(!e.ok)throw new Error(t.detail||"Platbu se nepodařilo zahájit");window.location.href=t.checkout_url}).catch(e=>{se(e.message),me(null)}))},ue=useCallback(()=>{if(O("both"),W(!1),B({safe:null,aggressive:null}),D({}),F(""),V.current=new Set,API_BASE_URL){const e=setTimeout(()=>W(!0),3e3);fetch(`${API_BASE_URL}/health`,{signal:AbortSignal.timeout(6e4)}).catch(()=>{}).finally(()=>{const t=80===k?getAvailableMarkets(R).map(e=>e.id):x;fetchTicketsFromBackend(k,R,t,z,"/tickets/generate").then(e=>{B(e),K.current=[...e.safe?.selections||[],...e.aggressive?.selections||[]].map(e=>e.home+"-"+e.away),D({}),te()}).catch(e=>{console.warn("Backend chyba:",e),B({safe:null,aggressive:null}),D({}),F(e.message||"Generování se nepovedlo.")}).finally(()=>{clearTimeout(e),O(null),W(!1)})})}else B({safe:null,aggressive:null}),O(null)},[k,R,x,z]);useRef(!1);return e?React.createElement("div",{className:"app-shell"},o&&React.createElement(PostRegOnboarding,{onDone:()=>{r(!1),i(!0)}}),l&&React.createElement(AppTour,{onDone:()=>i(!1)}),React.createElement("div",{className:"topbar"},React.createElement("div",{className:"brand display"},React.createElement("span",{className:"brand-dot"}),"ApexSignal"),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},API_BASE_URL&&React.createElement("button",{onClick:()=>G(e=>!e),style:{background:"rgba(25,224,196,0.12)",border:"1.5px solid var(--accent-safe)",borderRadius:14,padding:"5px 9px",fontSize:12.5,fontWeight:800,color:"var(--accent-safe)",cursor:"pointer",display:"flex",alignItems:"center",gap:4,whiteSpace:"nowrap",flexShrink:0},title:"Můj účet a tokeny — klikni pro dokoupení nebo uplatnění kódu"},"🎟️ ",null===$?"…":$,React.createElement("span",{style:{fontSize:9.5,fontWeight:700,color:"var(--text-muted)"}},"Účet ▾")),API_BASE_URL&&React.createElement("button",{onClick:()=>d(e=>!e),title:"Nastavení účtu",style:{background:"none",border:"none",color:"var(--text-muted)",cursor:"pointer",fontSize:16,padding:4}},"⚙️"),API_BASE_URL&&React.createElement("button",{className:"logout-btn",onClick:c,title:e.email},"Odhlásit"))),s&&React.createElement("div",{className:"card",style:{margin:"0 16px 12px",padding:14,borderColor:"var(--accent-danger)"}},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},React.createElement("div",{style:{fontWeight:700,fontSize:14,color:"var(--accent-danger)"}},"⚠️ Smazat účet"),React.createElement("button",{onClick:()=>d(!1),style:{background:"none",border:"none",color:"var(--text-muted)",cursor:"pointer",fontSize:16}},"✕")),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",marginBottom:10,lineHeight:1.5}},"Tahle akce je nevratná — appka smaže účet i všechny tikety a data s ním spojená. Pro potvrzení zadej znovu svoje heslo."),React.createElement("input",{type:"password",value:m,onChange:e=>p(e.target.value),placeholder:"Heslo",style:{width:"100%",padding:"8px 10px",borderRadius:8,border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text-primary)",fontSize:13,marginBottom:8,boxSizing:"border-box"}}),u&&React.createElement("div",{style:{fontSize:12,color:"var(--accent-danger)",marginBottom:8}},u),React.createElement("button",{onClick:()=>{m&&!g&&(y(!0),v(""),authFetch(`${API_BASE_URL}/account`,{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:m})}).then(async e=>{const t=await e.json();if(!e.ok)throw new Error(t.detail||"Něco se nepovedlo.");c()}).catch(e=>v(e.message||"Něco se nepovedlo.")).finally(()=>y(!1)))},disabled:g||!m,style:{width:"100%",padding:"10px",borderRadius:8,border:"none",background:"var(--accent-danger)",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}},g?"Mažu…":"Smazat účet natrvalo"),React.createElement("div",{style:{display:"flex",gap:12,justifyContent:"center",marginTop:14,fontSize:12}},React.createElement("a",{href:"/terms.html",target:"_blank",rel:"noopener",style:{color:"var(--text-muted)"}},"Obchodní podmínky"),React.createElement("a",{href:"/privacy.html",target:"_blank",rel:"noopener",style:{color:"var(--text-muted)"}},"Ochrana osobních údajů"))),Z&&React.createElement("div",{className:"card",style:{margin:"0 16px 12px",padding:14}},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},React.createElement("div",{style:{fontWeight:700,fontSize:14}},"🎟️ Tvoje tokeny: ",null===$?"…":$),React.createElement("button",{onClick:()=>G(!1),style:{background:"none",border:"none",color:"var(--text-muted)",cursor:"pointer",fontSize:16}},"✕")),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",marginBottom:10,lineHeight:1.5}},"Tokeny appka strhne při vygenerování tiketu — 1 token = ",ae?ae.token_value_kc:20," Kč.",ae&&React.createElement("div",{style:{marginTop:4}},"Krátký ",ae.costs.kratky," 🎟️ (",ae.costs_kc.kratky," Kč) · Střední ",ae.costs.stredni," 🎟️ (",ae.costs_kc.stredni," Kč) · BOOST ",ae.costs.boost," 🎟️ (",ae.costs_kc.boost," Kč)")),React.createElement("div",{style:{display:"flex",gap:8}},React.createElement("input",{type:"text",value:J,onChange:e=>Y(e.target.value),placeholder:"Zadej kód",style:{flex:1,padding:"8px 10px",borderRadius:8,border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text-primary)",fontSize:13}}),React.createElement("button",{onClick:()=>{J.trim()&&(ee(!0),X(""),authFetch(`${API_BASE_URL}/tokens/redeem`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:J.trim()})}).then(async e=>{const t=await e.json();if(!e.ok)throw new Error(t.detail||"Kód se nepodařilo uplatnit");U(t.balance),X(`✓ Přičteno ${t.tokens} tokenů`),Y("")}).catch(e=>X(e.message)).finally(()=>ee(!1)))},disabled:Q||!J.trim(),className:"btn btn-primary btn-small",style:{padding:"8px 16px",fontSize:13}},Q?"…":"Uplatnit")),q&&React.createElement("div",{style:{marginTop:8,fontSize:12,color:q.startsWith("✓")?"var(--accent-safe)":"var(--accent-danger)"}},q),React.createElement("div",{style:{borderTop:"1px solid var(--border)",marginTop:14,paddingTop:12}},React.createElement("button",{onClick:()=>re(e=>!e),className:"btn btn-primary btn-small",style:{width:"100%",padding:"9px",fontSize:13}},"💳 Dokoupit tokeny"))),oe&&React.createElement("div",{className:"card",style:{margin:"0 16px 12px",padding:14}},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},React.createElement("div",{style:{fontWeight:700,fontSize:14}},"💳 Dokoupit tokeny"),React.createElement("button",{onClick:()=>re(!1),style:{background:"none",border:"none",color:"var(--text-muted)",cursor:"pointer",fontSize:16}},"✕")),React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:10}},(ae?ae.packages:[{tokens:12,price_kc:240},{tokens:24,price_kc:480},{tokens:60,price_kc:1200}]).map(e=>React.createElement("button",{key:e.tokens,onClick:()=>pe(e.tokens),disabled:null!==de,style:{padding:"10px 6px",borderRadius:10,border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text-primary)",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2}},React.createElement("div",{style:{fontWeight:700,fontSize:15}},e.tokens," 🎟️"),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)"}},de===e.tokens?"…":`${e.price_kc} Kč`)))),React.createElement("div",{style:{fontSize:12,color:"var(--text-muted)",marginBottom:6}},"Nebo vlastní počet:"),React.createElement("div",{style:{display:"flex",gap:8}},React.createElement("input",{type:"number",min:ae?ae.min_custom_tokens:1,max:ae?ae.max_custom_tokens:5e3,value:le,onChange:e=>ie(e.target.value),placeholder:"Počet tokenů",style:{flex:1,padding:"8px 10px",borderRadius:8,border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text-primary)",fontSize:13}}),React.createElement("button",{onClick:()=>pe(parseInt(le,10)),disabled:null!==de||!le||parseInt(le,10)<1,className:"btn btn-primary btn-small",style:{padding:"8px 16px",fontSize:13}},de&&String(de)===le?"…":`Zaplatit ${le?parseInt(le,10)*(ae?ae.token_value_kc:20):0} Kč`)),ce&&React.createElement("div",{style:{marginTop:8,fontSize:12,color:"var(--accent-danger)"}},ce)),I&&React.createElement("div",{className:"card",style:{margin:"0 16px 12px",padding:"10px 14px",borderColor:"var(--accent-danger)",display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}},React.createElement("div",{style:{fontSize:13,color:"var(--accent-danger)"}},I),React.createElement("button",{onClick:()=>F(""),style:{background:"none",border:"none",color:"var(--text-muted)",cursor:"pointer",fontSize:16,flexShrink:0}},"✕")),React.createElement("div",{className:"content"},React.createElement("div",{style:{display:"tickets"===f?"flex":"none",flexDirection:"column",gap:16}},React.createElement(TicketsView,{riskLevel:k,setRiskLevel:b,selectedSports:R,toggleSport:e=>E(t=>{const a=t.includes(e)?t.filter(t=>t!==e):[...t,e],n=getAvailableMarkets(a).map(e=>e.id);return S(e=>{const t=e.filter(e=>n.includes(e));return t.length>0?t:n}),a}),selectedMarkets:x,toggleMarket:e=>S(t=>t.includes(e)?t.filter(t=>t!==e):[...t,e]),timeFrame:z,setTimeFrame:w,tokenPrices:ae,generate:ue,loadingType:j,tickets:N,regenerate:e=>{if(O(e),API_BASE_URL){const t=80===k?getAvailableMarkets(R).map(e=>e.id):x;F(""),fetchTicketsFromBackend(k,R,t,z,"/tickets/regenerate").then(t=>{const a=t[e];B(t=>({...t,[e]:a})),a&&(K.current=[...K.current,...a.selections.map(e=>e.home+"-"+e.away)]),D(t=>({...t,[e]:!1})),te()}).catch(t=>{console.warn("Backend chyba při regeneraci:",t),B(t=>({...t,[e]:null})),F(t.message||"Generování se nepovedlo.")}).finally(()=>O(null))}else B(t=>({...t,[e]:null})),O(null)},saveTicket:(e,t=null,a=null)=>{const n=N[e];n?M[e]||(H(t=>({...t,[e]:!0})),authFetch(`${API_BASE_URL}/tickets/save`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ticket_type:n.type||"stredni",selections:n.selections.map(e=>e.raw||{match_id:0,home_team:e.home,away_team:e.away,market_type:"match_winner",selection:e.market,probability:e.prob,odds:e.odds,model_probability:e.prob,market_probability:null,edge:null,reasoning:"",data_quality:""}),total_odds:a||n.totalOdds||1,combined_probability:n.combinedProb||0,recommended_stake_pct:n.recommendedStakePct||0})}).then(e=>{if(!e.ok)throw new Error("HTTP "+e.status);return e.json()}).then(a=>{D(t=>({...t,[e]:!0})),t&&a.ticket_id&&setTimeout(()=>{authFetch(`${API_BASE_URL}/tickets/${a.ticket_id}/stake`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({stake_amount:t,odds:n.totalOdds})}).catch(e=>console.warn("Uložení sázky selhalo:",e))},500)}).catch(e=>{console.error("Uložení tiketu selhalo:",e),alert("Uložení selhalo: "+e.message)}).finally(()=>H(t=>({...t,[e]:!1})))):D(t=>({...t,[e]:!0}))},savedTypes:L,savingTypes:M,serverWaking:P,removeSelection:(e,t=!0)=>{const a=e.raw?.match_id;a&&V.current.add(a),B(t=>{if(!t.safe)return t;const a=t.safe.selections.filter(t=>t.home!==e.home||t.away!==e.away);if(0===a.length)return{...t,safe:null};const n=parseFloat(a.reduce((e,t)=>e*t.odds,1).toFixed(2));return{...t,safe:{...t.safe,selections:a,totalOdds:n}}}),t&&(O("replacing"),authFetch(`${API_BASE_URL}/tickets/replace-selection`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({risk_level:k,sports:R,market_types:x,time_frame_days:z,exclude_match_ids:Array.from(V.current)})}).then(e=>{if(!e.ok)throw new Error("HTTP "+e.status);return e.json()}).then(e=>{const t=adaptBackendTicket(e.safe);t&&0!==t.selections.length&&B(e=>{if(!e.safe)return e;const a=new Set(e.safe.selections.map(e=>e.raw?.match_id).filter(Boolean)),n=t.selections.filter(e=>{const t=e.raw?.match_id;return t&&!a.has(t)&&!V.current.has(t)});if(0===n.length)return e;const o=n.sort((e,t)=>t.prob-e.prob)[0],r=[...e.safe.selections,o],l=parseFloat(r.reduce((e,t)=>e*t.odds,1).toFixed(2));return{...e,safe:{...e.safe,selections:r,totalOdds:l}}})}).catch(e=>{console.warn("Náhrada výběru selhala:",e),alert("Nepodařilo se najít náhradní zápas.")}).finally(()=>O(null)))},updateSelectionOdds:(e,t)=>{!t||isNaN(t)||t<1||B(a=>{if(!a.safe)return a;const n=a.safe.selections.map((a,n)=>n===e?{...a,odds:t,raw:a.raw?{...a.raw,odds:t}:a.raw}:a),o=n.reduce((e,t)=>e*t.odds,1);return{...a,safe:{...a.safe,selections:n,totalOdds:o}}})},customDate:_,setCustomDate:T,dateRange:C,setDateRange:A})),React.createElement("div",{style:{display:"history"===f?"block":"none"}},React.createElement(HistoryView,null))),React.createElement("div",{className:"bottom-nav"},React.createElement("button",{className:"nav-btn"+("tickets"===f?" active":""),onClick:()=>h("tickets")},React.createElement(IconTicket,{nav:!0})," ",React.createElement("span",null,"Tikety")),React.createElement("button",{className:"nav-btn"+("history"===f?" active":""),onClick:()=>h("history")},React.createElement(IconHistory,{nav:!0})," ",React.createElement("span",null,"Historie")))):a?React.createElement(OnboardingScreen,{onContinue:()=>n(!1)}):React.createElement(AuthScreen,{onAuthenticated:e=>{setStoredAuth({token:e.token,email:e.email}),t({token:e.token,email:e.email}),e.is_new_user&&r(!0)}})}ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(ApexSignalApp,null));</script>
+<style>@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes blink { 50% { opacity: 0; } }</style>
 <script>
-const API = 'https://apexsignal-backend.onrender.com';
-let token = localStorage.getItem('apex_token') || '';
-let userEmail = localStorage.getItem('apex_email') || '';
-
-// ── AUTH ──────────────────────────────────────────────────────────────
-window.onload = () => {
-  if (token) showMain();
-  else showLoginView();
-};
-
-function showLoginView() {
-  document.getElementById('loginView').style.display = 'block';
-  document.getElementById('mainView').style.display = 'none';
-}
-
-function showMain() {
-  document.getElementById('loginView').style.display = 'none';
-  document.getElementById('mainView').style.display = 'block';
-  document.getElementById('headerRight').innerHTML = `
-    <div class="user-info">
-      <span>${userEmail}</span>
-      <button class="btn-logout" onclick="logout()">Odhlásit</button>
-    </div>`;
-}
-
-function showRegister() {
-  document.getElementById('registerFields').style.display = 'block';
-  document.getElementById('loginFields').style.display = 'none';
-  document.getElementById('authTitle').textContent = 'Registrace';
-}
-
-function showLogin() {
-  document.getElementById('registerFields').style.display = 'none';
-  document.getElementById('loginFields').style.display = 'block';
-  document.getElementById('authTitle').textContent = 'Přihlášení';
-}
-
-async function login() {
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
-  try {
-    const r = await fetch(`${API}/auth/login`, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({email, password})
+  // Service worker appka potřebuje jen pro to, aby ji telefon (hlavně
+  // Android/Chrome) nabídl k instalaci na domovskou obrazovku — appka
+  // sama o sobě je pořád živá webová appka, žádné offline ambice.
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch((err) => {
+        console.warn("Service worker se nezaregistroval (appka i tak funguje normálně):", err);
+      });
     });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.detail || 'Chyba přihlášení');
-    token = d.token;
-    userEmail = d.email;
-    localStorage.setItem('apex_token', token);
-    localStorage.setItem('apex_email', userEmail);
-    showMain();
-  } catch(e) {
-    showAuthError(e.message);
   }
-}
-
-async function register() {
-  const email = document.getElementById('regEmail').value;
-  const password = document.getElementById('regPassword').value;
-  try {
-    const r = await fetch(`${API}/auth/register`, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({email, password})
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.detail || 'Chyba registrace');
-    token = d.token;
-    userEmail = d.email;
-    localStorage.setItem('apex_token', token);
-    localStorage.setItem('apex_email', userEmail);
-    showMain();
-  } catch(e) {
-    showAuthError(e.message);
-  }
-}
-
-function logout() {
-  token = ''; userEmail = '';
-  localStorage.removeItem('apex_token');
-  localStorage.removeItem('apex_email');
-  document.getElementById('ticketsContainer').innerHTML = '';
-  showLoginView();
-}
-
-function showAuthError(msg) {
-  const el = document.getElementById('authError');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-// ── TABS ──────────────────────────────────────────────────────────────
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    t.classList.toggle('active', (i===0 && tab==='generator') || (i===1 && tab==='history'));
-  });
-  document.getElementById('generatorSection').classList.toggle('active', tab==='generator');
-  document.getElementById('historySection').classList.toggle('active', tab==='history');
-  if (tab === 'history') loadHistory();
-}
-
-// ── CHIPS ─────────────────────────────────────────────────────────────
-function toggleChip(el, group) {
-  const activeClass = group === 'sport' ? 'active-cyan' : 'active-orange';
-  el.classList.toggle(activeClass);
-}
-
-function getActiveChips(group) {
-  const map = {
-    'Fotbal': 'football', 'Tenis': 'tennis', 'Hokej': 'hockey', 'Basket': 'basketball',
-    'Výhra': 'match_winner', 'Over gólů': 'over_goals', 'Over karet': 'over_cards', 'BTTS': 'btts'
-  };
-  const activeClass = group === 'sport' ? 'active-cyan' : 'active-orange';
-  return [...document.querySelectorAll(`.chip.${activeClass}`)]
-    .map(c => map[c.textContent.trim()])
-    .filter(Boolean);
-}
-
-function updateDaysLabel(v) {
-  document.getElementById('daysLabel').textContent = v == 1 ? '1 den' : `${v} dny`;
-}
-
-// ── GENERATE ──────────────────────────────────────────────────────────
-async function generateTickets() {
-  const btn = document.getElementById('generateBtn');
-  const loadingBar = document.getElementById('loadingBar');
-  const loadingText = document.getElementById('loadingText');
-  const errEl = document.getElementById('genError');
-
-  errEl.style.display = 'none';
-  btn.disabled = true;
-  btn.textContent = 'Generuji…';
-  loadingBar.classList.add('active');
-  loadingText.classList.add('active');
-
-  const sports = getActiveChips('sport');
-  const markets = getActiveChips('market');
-
-  if (!sports.length || !markets.length) {
-    showGenError('Vyber aspoň 1 sport a 1 typ trhu.');
-    resetBtn();
-    return;
-  }
-
-  try {
-    const r = await fetch(`${API}/tickets/generate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        risk_level: parseInt(document.getElementById('riskSlider').value),
-        sports,
-        market_types: markets,
-        time_frame_days: parseInt(document.getElementById('daysSlider').value)
-      })
-    });
-
-    if (r.status === 401) { logout(); return; }
-    const d = await r.json();
-    renderTickets(d);
-  } catch(e) {
-    showGenError('Chyba připojení k serveru. Zkus to znovu.');
-  } finally {
-    resetBtn();
-  }
-}
-
-function resetBtn() {
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = false;
-  btn.textContent = 'Vygenerovat tikety →';
-  document.getElementById('loadingBar').classList.remove('active');
-  document.getElementById('loadingText').classList.remove('active');
-}
-
-function showGenError(msg) {
-  const el = document.getElementById('genError');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-// ── RENDER TICKETS ────────────────────────────────────────────────────
-function renderTickets(data) {
-  const container = document.getElementById('ticketsContainer');
-  container.innerHTML = '';
-
-  if (!data.safe && !data.aggressive) {
-    container.innerHTML = `<div class="empty-state">
-      <div class="icon">🔍</div>
-      Žádné výběry nepřešly filtrem pro dnešní den.<br>Zkus změnit parametry nebo jiný den.
-    </div>`;
-    return;
-  }
-
-  if (data.safe) container.appendChild(buildTicketCard(data.safe, 'safe'));
-  if (data.aggressive) container.appendChild(buildTicketCard(data.aggressive, 'aggressive'));
-}
-
-function buildTicketCard(ticket, type) {
-  const isSafe = type === 'safe';
-  const color = isSafe ? 'safe' : 'aggressive';
-  const label = isSafe ? 'SAFE · 2-5' : 'AGGRESSIVE · 5-10';
-
-  const card = document.createElement('div');
-  card.className = 'ticket-card';
-  card.dataset.ticket = JSON.stringify(ticket);
-
-  // Header
-  const header = document.createElement('div');
-  header.className = 'ticket-header';
-  header.innerHTML = `
-    <div class="ticket-badge">
-      <span class="badge badge-${color}">${label}</span>
-      <span class="tip-count">${ticket.selections.length} tip${ticket.selections.length > 1 ? 'y' : ''}</span>
-    </div>
-    <div>
-      <div class="total-odds odds-${color}">${ticket.total_odds}</div>
-      <div class="odds-label">celkový kurz</div>
-    </div>`;
-  card.appendChild(header);
-
-  // Selections
-  ticket.selections.forEach(s => {
-    const sel = document.createElement('div');
-    sel.className = 'selection';
-    const marketLabel = formatMarket(s.market_type, s.selection);
-    const prob = Math.round(s.probability * 100);
-    const hasReal = s.market_probability !== null;
-    sel.innerHTML = `
-      <div class="selection-teams">${s.home_team} – ${s.away_team}</div>
-      <div class="selection-market">${marketLabel}${hasReal ? ' · <span style="color:var(--cyan);font-size:10px">kurzy ✓</span>' : ''}${s.market_type === 'over_cards' ? ' · <span style="color:#f59e0b;font-size:10px">⚠ ověř na Tipsportu</span>' : ''}</div>
-      <div class="selection-bottom">
-        <div class="prob-bar">
-          <div class="prob-fill-${color}" style="width:${prob}%"></div>
-        </div>
-        <div class="selection-odds" style="color:var(--${color})">${s.odds}</div>
-        <div class="selection-prob">${prob}%</div>
-      </div>`;
-    card.appendChild(sel);
-  });
-
-  // Footer
-  const footer = document.createElement('div');
-  footer.className = 'ticket-footer';
-  footer.innerHTML = `
-    <div class="combined-prob">Kombinovaná pravděpodobnost <span>${Math.round(ticket.combined_probability*100)}%</span></div>
-    <div class="stake-info">Vklad <span>${ticket.recommended_stake_pct}%</span> bankrollu</div>`;
-  card.appendChild(footer);
-
-  // Actions
-  const actions = document.createElement('div');
-  actions.className = 'ticket-actions';
-  actions.innerHTML = `
-    <button class="btn-regen" onclick="generateTickets()">↻ Regenerovat</button>
-    <button class="btn-save" onclick="saveTicket(this, '${type}')">🔖 Uložit tiket</button>`;
-  card.appendChild(actions);
-
-  return card;
-}
-
-function formatMarket(type, selection) {
-  const map = {
-    'match_winner': {'home': 'Výhra domácích', 'away': 'Výhra hostů', 'draw': 'Remíza'},
-    'over_goals': selection,
-    'over_cards': selection,
-    'btts': 'Oba dají gól',
-  };
-  if (type === 'match_winner') return map.match_winner[selection] || selection;
-  if (type === 'over_goals') return `Over ${selection.replace('over_','')} gólů`;
-  if (type === 'over_cards') return `Over ${selection.replace('over_','')} karet`;
-  if (type === 'btts') return 'BTTS — oba dají gól';
-  return selection;
-}
-
-// ── SAVE TICKET ───────────────────────────────────────────────────────
-async function saveTicket(btn, type) {
-  const card = btn.closest('.ticket-card');
-  const ticket = JSON.parse(card.dataset.ticket);
-
-  btn.textContent = 'Ukládám…';
-  btn.disabled = true;
-
-  try {
-    const r = await fetch(`${API}/tickets/save`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        ticket_type: ticket.ticket_type,
-        selections: ticket.selections,
-        total_odds: ticket.total_odds,
-        combined_probability: ticket.combined_probability,
-        recommended_stake_pct: ticket.recommended_stake_pct
-      })
-    });
-    if (r.ok) {
-      btn.textContent = '✓ Uloženo';
-      btn.style.background = 'rgba(0,229,200,0.3)';
-    } else {
-      btn.textContent = '🔖 Uložit tiket';
-      btn.disabled = false;
-    }
-  } catch(e) {
-    btn.textContent = '🔖 Uložit tiket';
-    btn.disabled = false;
-  }
-}
-
-// ── HISTORY ───────────────────────────────────────────────────────────
-async function loadHistory() {
-  const container = document.getElementById('historyContainer');
-  container.innerHTML = '<div class="empty-state"><div class="icon">⏳</div>Načítám historii…</div>';
-
-  try {
-    const r = await fetch(`${API}/tickets/saved`, {
-      headers: {'Authorization': `Bearer ${token}`}
-    });
-    if (r.status === 401) { logout(); return; }
-    const tickets = await r.json();
-
-    if (!tickets.length) {
-      container.innerHTML = '<div class="empty-state"><div class="icon">🎫</div>Zatím žádné uložené tikety</div>';
-      return;
-    }
-
-    container.innerHTML = '';
-    tickets.forEach(t => {
-      const el = document.createElement('div');
-      el.className = 'saved-ticket';
-      const statusClass = `status-${t.status}`;
-      const statusLabel = {pending:'Čeká', won:'Výhra ✓', lost:'Prohra ✗'}[t.status] || t.status;
-      el.innerHTML = `
-        <div class="saved-header">
-          <div>
-            <span class="badge badge-${t.ticket_type}">${t.ticket_type.toUpperCase()}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="status-badge ${statusClass}">${statusLabel}</span>
-            <span style="font-family:JetBrains Mono,monospace;font-size:16px;font-weight:700;color:var(--${t.ticket_type==='safe'?'safe':'aggressive'})">${t.total_odds}</span>
-          </div>
-        </div>
-        ${t.selections.map(s=>`
-          <div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
-            <div style="font-weight:600">${s.home_team} – ${s.away_team}</div>
-            <div style="color:var(--text-muted)">${formatMarket(s.market_type,s.selection)} · ${s.odds}</div>
-          </div>`).join('')}
-        <div style="padding-top:8px;display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)">
-          <span>Pravděpodobnost <span style="color:var(--text-dim);font-family:JetBrains Mono,monospace">${Math.round(t.combined_probability*100)}%</span></span>
-          <span>Doporučený vklad <span style="color:var(--cyan);font-family:JetBrains Mono,monospace">${t.recommended_stake_pct}%</span></span>
-        </div>`;
-      container.appendChild(el);
-    });
-  } catch(e) {
-    container.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div>Chyba načítání historie</div>';
-  }
-}
 </script>
 </body>
 </html>
